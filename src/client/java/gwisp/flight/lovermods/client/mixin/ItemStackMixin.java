@@ -16,45 +16,66 @@ import java.util.List;
 @Mixin(ItemStack.class)
 public class ItemStackMixin {
 
-    @Inject(method = "method_7950", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "method_7950", at = @At("RETURN"))
     private void addSkinPriceTooltip(Item.TooltipContext context, PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir) {
         List<Text> tooltip = cir.getReturnValue();
 
         String skinName = null;
-        for (Text line : tooltip) {
-            String lineText = line.getString();
+        int skinInfoPosition = -1;
+        int skinnerPosition = -1;
+        boolean hasYearLine = false;
+        String itemName = null;
 
-            System.out.println("[LoverMods DEBUG] Tooltip line: " + lineText);
+        for (int i = 0; i < tooltip.size(); i++) {
+            String lineText = tooltip.get(i).getString();
+
+            if (i == 0) {
+                itemName = extractItemName(lineText);
+            }
 
             if (lineText.toLowerCase().contains("skin:")) {
                 skinName = extractSkinName(lineText);
-                System.out.println("[LoverMods DEBUG] Found skin name: " + skinName);
-                break;
+            }
+
+            if (lineText.toUpperCase().contains("SKIN INFORMATION:")) {
+                skinInfoPosition = i;
+            }
+
+            if (lineText.toLowerCase().contains("skinner:")) {
+                skinnerPosition = i;
+            }
+
+            // Check if "Year:" line exists
+            if (lineText.toLowerCase().contains("year:")) {
+                hasYearLine = true;
             }
         }
 
-        if (skinName != null) {
-            System.out.println("[LoverMods DEBUG] Checking for skin: '" + skinName + "'");
-            System.out.println("[LoverMods DEBUG] Lowercase version: '" + skinName.toLowerCase() + "'");
-            System.out.println("[LoverMods DEBUG] Has skin data: " + SkinPriceManager.hasSkinData(skinName));
-            System.out.println("[LoverMods DEBUG] Total skins loaded: " + SkinPriceManager.getSkinCount());
+        // ONLY use item name if Year line is present AND we have skin info position because uhhh why not? ik this is kinda weird to do but skindex exist
+        if (hasYearLine && skinInfoPosition != -1 && itemName != null) {
+            skinName = itemName;
+        }
 
-            if (SkinPriceManager.hasSkinData(skinName)) {
-                SkinData skinData = SkinPriceManager.getSkinData(skinName);
+        if (skinName != null && SkinPriceManager.hasSkinData(skinName)) {
+            SkinData skinData = SkinPriceManager.getSkinData(skinName);
 
-                System.out.println("[LoverMods DEBUG] Adding skin data to tooltip for: " + skinName);
+            int insertPosition = skinInfoPosition != -1 ? skinInfoPosition + 1 : (skinnerPosition != -1 ? skinnerPosition + 1 : -1);
 
-                tooltip.add(Text.literal(""));
-                tooltip.add(Text.literal(skinData.getFormattedValue()));
-                tooltip.add(Text.literal(skinData.getFormattedDemand()));
-                tooltip.add(Text.literal(skinData.getFormattedSeason()));
-                tooltip.add(Text.literal(skinData.getFormattedSet()));
+            if (insertPosition != -1) {
+                tooltip.add(insertPosition, Text.literal(skinData.getFormattedValue()));
+                tooltip.add(insertPosition + 1, Text.literal(skinData.getFormattedDemand()));
+                tooltip.add(insertPosition + 2, Text.literal(skinData.getFormattedSeason()));
+                tooltip.add(insertPosition + 3, Text.literal(skinData.getFormattedSet()));
             }
         }
     }
 
+    private String extractItemName(String line) {
+        String cleaned = line.replaceAll("§[0-9a-fk-or]", "").trim();
+        return cleaned.isEmpty() ? null : cleaned;
+    }
+
     private String extractSkinName(String line) {
-        // Remove all Minecraft color codes
         String cleaned = line.replaceAll("§[0-9a-fk-or]", "");
 
         int skinIndex = cleaned.toLowerCase().indexOf("skin:");

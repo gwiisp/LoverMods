@@ -1,9 +1,12 @@
 package gwisp.flight.lovermods.client;
 
+import gwisp.flight.lovermods.update.UpdateChecker;
+import gwisp.flight.lovermods.update.UpdateScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -14,20 +17,15 @@ public class LovermodsClient implements ClientModInitializer {
 
     private static KeyBinding toggleKey;
     private static KeyBinding flipAxisKey;
+    private static boolean checkedForUpdates = false;
 
     @Override
     public void onInitializeClient() {
 
-        System.out.println("[LoverMods] ========== CLIENT INITIALIZING ==========");
-        System.out.println("[LoverMods] About to call SkinPriceManager.init()...");
-
         SkinPriceManager.init();
 
-        System.out.println("[LoverMods] SkinPriceManager.init() completed!");
         System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
-        System.out.println("[LoverMods] ========================================");
 
-        // Register keybindings
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.lovermods.toggle_highlight",
                 InputUtil.Type.KEYSYM,
@@ -42,9 +40,13 @@ public class LovermodsClient implements ClientModInitializer {
                 "category.lovermods"
         ));
 
-        // Register tick events
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) return;
+
+            if (!checkedForUpdates && client.currentScreen == null) {
+                checkedForUpdates = true;
+                checkForUpdates(client);
+            }
 
             while (toggleKey.wasPressed()) {
                 NetherwartHighlighterClient.toggleEnabled();
@@ -62,7 +64,16 @@ public class LovermodsClient implements ClientModInitializer {
             NetherwartHighlighterClient.tick(client);
         });
 
-        // Register render event
         WorldRenderEvents.AFTER_ENTITIES.register(NetherwartHighlighterClient::renderHighlights);
+    }
+
+    private void checkForUpdates(MinecraftClient client) {
+        UpdateChecker.checkForUpdates().thenAccept(updateInfo -> {
+            if (updateInfo != null && updateInfo.hasUpdate()) {
+                client.execute(() -> {
+                    client.setScreen(new UpdateScreen(null, updateInfo));
+                });
+            }
+        });
     }
 }

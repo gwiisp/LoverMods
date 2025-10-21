@@ -43,10 +43,10 @@ public class SkinData {
     public String getFormattedDemand() {
         String displayDemand = (demand == null || demand.isEmpty()) ? "UNKNOWN" : demand;
         String color = switch (displayDemand.toUpperCase()) {
-            case "HIGH" -> "§c";
-            case "MEDIUM" -> "§e";
-            case "LOW" -> "§a";
-            default -> "§7";
+            case "HIGH" -> "§c§l";
+            case "MEDIUM" -> "§e§l";
+            case "LOW" -> "§a§l";
+            default -> "§7§l";
         };
         return "§e[LM] Skin Demand: " + color + displayDemand.toUpperCase();
     }

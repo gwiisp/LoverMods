@@ -59,7 +59,6 @@ public class SkinPriceManager {
 
         System.out.println("[LoverMods] ===== SKIN PRICE LOADING COMPLETE =====");
 
-        // Schedule updates every hour (async is fine for periodic updates)
         SCHEDULER.scheduleAtFixedRate(() -> {
             try {
                 fetchPrices();
