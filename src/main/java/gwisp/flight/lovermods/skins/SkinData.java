@@ -37,7 +37,7 @@ public class SkinData {
 
     public String getFormattedValue() {
         String displayValue = (value == null || value.isEmpty()) ? "UNKNOWN" : value;
-        return "§e[LM] §bSkin Value: §f" + displayValue;
+        return "§e[LM] Skin Value: §f" + displayValue;
     }
 
     public String getFormattedDemand() {
@@ -48,16 +48,16 @@ public class SkinData {
             case "LOW" -> "§a";
             default -> "§7";
         };
-        return "§e[LM] §bSkin Demand: " + color + displayDemand.toUpperCase();
+        return "§e[LM] Skin Demand: " + color + displayDemand.toUpperCase();
     }
 
     public String getFormattedSeason() {
         String displaySeason = (season == null || season.isEmpty()) ? "UNKNOWN" : season;
-        return "§e[LM] §bSkin Season: §f" + displaySeason;
+        return "§e[LM] Skin Season: §f" + displaySeason;
     }
 
     public String getFormattedSet() {
         String displaySet = (set == null || set.isEmpty()) ? "UNKNOWN" : set;
-        return "§e[LM] §bSkin Set: §f" + displaySet;
+        return "§e[LM] Skin Set: §f" + displaySet;
     }
 }
