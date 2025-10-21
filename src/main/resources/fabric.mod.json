@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "lovermods",
+  "version": "${version}",
+  "name": "LoverMods",
+  "description": "LoverMods ALPHA By Gwisp!",
+  "authors": ["Gwisp"],
+  "contact": {},
+  "license": "CC0-1.0",
+  "icon": "assets/lovermods/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "gwisp.flight.lovermods.client.LovermodsClient"
+    ]
+  },
+  "mixins": [
+    "lovermods.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.3",
+    "minecraft": ">=1.21.4 <=1.21.5",
+    "java": ">=21"
+  }
+}

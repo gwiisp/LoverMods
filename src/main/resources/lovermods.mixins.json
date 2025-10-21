@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "gwisp.flight.lovermods.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "lovermods.refmap.json",
+  "mixins": [],
+  "client": [
+    "PlayerListEntryMixin",
+    "ItemStackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
