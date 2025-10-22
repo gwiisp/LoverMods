@@ -1,6 +1,7 @@
 package gwisp.flight.lovermods.client;
 
 import gwisp.flight.lovermods.client.commands.ClientRefreshSkinsCommand;
+import gwisp.flight.lovermods.client.splash.SplashTextManager;
 import gwisp.flight.lovermods.update.UpdateChecker;
 import gwisp.flight.lovermods.update.UpdateScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,9 +27,10 @@ public class LovermodsClient implements ClientModInitializer {
 
         SkinPriceManager.init();
 
+        SplashTextManager.loadSplashes();
+
         System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
 
-        // Register client command
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             ClientRefreshSkinsCommand.register(dispatcher);
         });
