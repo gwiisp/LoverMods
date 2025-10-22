@@ -45,13 +45,11 @@ public class ItemStackMixin {
                 skinnerPosition = i;
             }
 
-            // Check if "Year:" line exists
             if (lineText.toLowerCase().contains("year:")) {
                 hasYearLine = true;
             }
         }
 
-        // ONLY use item name if Year line is present AND we have skin info position because uhhh why not? ik this is kinda weird to do but skindex exist
         if (hasYearLine && skinInfoPosition != -1 && itemName != null) {
             skinName = itemName;
         }

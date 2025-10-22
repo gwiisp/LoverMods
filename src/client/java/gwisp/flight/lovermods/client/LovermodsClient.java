@@ -1,8 +1,10 @@
 package gwisp.flight.lovermods.client;
 
+import gwisp.flight.lovermods.client.commands.ClientRefreshSkinsCommand;
 import gwisp.flight.lovermods.update.UpdateChecker;
 import gwisp.flight.lovermods.update.UpdateScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -25,6 +27,11 @@ public class LovermodsClient implements ClientModInitializer {
         SkinPriceManager.init();
 
         System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
+
+        // Register client command
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            ClientRefreshSkinsCommand.register(dispatcher);
+        });
 
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.lovermods.toggle_highlight",

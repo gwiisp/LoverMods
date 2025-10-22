@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class UpdateChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger("LoverMods");
-    private static final String MODRINTH_API = "https://api.modrinth.com/v2/project/YOUR_PROJECT_ID/version";
+    private static final String MODRINTH_API = "https://api.modrinth.com/v2/project/AzKljFar/version";
     private static final String GITHUB_API = "https://api.github.com/repos/gwiisp/lovermods/releases/latest";
 
     private static String latestVersion = null;

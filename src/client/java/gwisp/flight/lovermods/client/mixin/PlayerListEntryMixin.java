@@ -26,6 +26,7 @@ public abstract class PlayerListEntryMixin {
         CAPE_MAP.put("Gwisp", "gwisp_cape");
         CAPE_MAP.put("UrFaveFriday", "fridaycape");
         CAPE_MAP.put("LoverMods", "lovermodsminecon");
+        CAPE_MAP.put("Collexl", "collexxl");
     }
 
     @Inject(
