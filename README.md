@@ -1,4 +1,4 @@
-# LoverMods test
+# LoverMods
 
 **LoverMods** is a feature-rich companion mod built to enhance the overall **LoverCraft** experience all the way from farming to trading. It brings together quality-of-life, cosmetic and informational features that make gameplay smoother, clearer and more rewarding, all without breaking the vanilla balance.
 
