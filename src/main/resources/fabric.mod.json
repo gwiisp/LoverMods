@@ -3,7 +3,7 @@
   "id": "lovermods",
   "version": "${version}",
   "name": "LoverMods",
-  "description": "LoverMods ALPHA By Gwisp!",
+  "description": "LoverMods is a utility mod for the minecraft server LoverCraft!",
   "authors": ["Gwisp"],
   "contact": {},
   "license": "CC0-1.0",
@@ -19,7 +19,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.17.2",
-    "minecraft": ">=1.21.4 <=1.21.5",
+    "minecraft": ">=1.21.4 <=1.21.7",
     "java": ">=21"
   }
 }
