@@ -1,5 +1,7 @@
 package gwisp.flight.lovermods.client.mixin;
 
+import gwisp.flight.lovermods.client.LovermodsClient;
+import gwisp.flight.lovermods.config.ModConfig;
 import gwisp.flight.lovermods.skins.SkinData;
 import gwisp.flight.lovermods.skins.SkinPriceManager;
 import net.minecraft.item.tooltip.TooltipType;
@@ -18,6 +20,12 @@ public class ItemStackMixin {
 
     @Inject(method = "method_7950", at = @At("RETURN"))
     private void addSkinPriceTooltip(Item.TooltipContext context, PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir) {
+
+        ModConfig config = LovermodsClient.getConfig();
+        if (config == null || !config.isSkinPricesEnabled()) {
+            return;
+        }
+
         List<Text> tooltip = cir.getReturnValue();
 
         String skinName = null;
@@ -60,10 +68,23 @@ public class ItemStackMixin {
             int insertPosition = skinInfoPosition != -1 ? skinInfoPosition + 1 : (skinnerPosition != -1 ? skinnerPosition + 1 : -1);
 
             if (insertPosition != -1) {
+
                 tooltip.add(insertPosition, Text.literal(skinData.getFormattedValue()));
-                tooltip.add(insertPosition + 1, Text.literal(skinData.getFormattedDemand()));
-                tooltip.add(insertPosition + 2, Text.literal(skinData.getFormattedSeason()));
-                tooltip.add(insertPosition + 3, Text.literal(skinData.getFormattedSet()));
+                int nextPosition = insertPosition + 1;
+
+                if (config.isShowDemand()) {
+                    tooltip.add(nextPosition, Text.literal(skinData.getFormattedDemand()));
+                    nextPosition++;
+                }
+
+                if (config.isShowSeason()) {
+                    tooltip.add(nextPosition, Text.literal(skinData.getFormattedSeason()));
+                    nextPosition++;
+                }
+
+                if (config.isShowSet()) {
+                    tooltip.add(nextPosition, Text.literal(skinData.getFormattedSet()));
+                }
             }
         }
     }

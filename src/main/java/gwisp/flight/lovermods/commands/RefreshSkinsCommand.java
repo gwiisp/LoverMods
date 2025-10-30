@@ -30,7 +30,7 @@ public class RefreshSkinsCommand {
             context.getSource().sendError(
                     Text.literal("§c[LoverMods] Failed to refresh skins: " + e.getMessage()));
             e.printStackTrace();
-            return 0; // Failure
+            return 0;
         }
     }
 }

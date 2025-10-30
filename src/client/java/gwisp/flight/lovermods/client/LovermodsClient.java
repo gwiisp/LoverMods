@@ -1,8 +1,12 @@
 package gwisp.flight.lovermods.client;
 
 import gwisp.flight.lovermods.client.commands.ClientRefreshSkinsCommand;
+import gwisp.flight.lovermods.client.commands.ConfigCommand;
 import gwisp.flight.lovermods.client.cosmetics.CosmeticManager;
+import gwisp.flight.lovermods.client.gui.ConfigScreen;
+import gwisp.flight.lovermods.client.render.ItemFrameSkinValueRenderer;
 import gwisp.flight.lovermods.client.splash.SplashTextManager;
+import gwisp.flight.lovermods.config.ModConfig;
 import gwisp.flight.lovermods.update.UpdateChecker;
 import gwisp.flight.lovermods.update.UpdateScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -20,23 +24,28 @@ import org.lwjgl.glfw.GLFW;
 
 public class LovermodsClient implements ClientModInitializer {
 
+    private static ModConfig config;
     private static KeyBinding toggleKey;
     private static KeyBinding flipAxisKey;
+    private static KeyBinding openConfigKey;
     private static boolean checkedForUpdates = false;
 
     @Override
     public void onInitializeClient() {
+        config = ModConfig.load();
+        System.out.println("[LoverMods] Config loaded successfully");
 
         SkinPriceManager.init();
+        System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
 
         SplashTextManager.loadSplashes();
 
         CosmeticManager.loadCosmetics();
 
-        System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
-
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             ClientRefreshSkinsCommand.register(dispatcher);
+            ConfigCommand.register(dispatcher, config);
+            gwisp.flight.lovermods.client.commands.DungeonInviteCommand.register(dispatcher, config);
         });
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -58,31 +67,69 @@ public class LovermodsClient implements ClientModInitializer {
                 "category.lovermods"
         ));
 
+        openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.lovermods.open_config",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_RIGHT_SHIFT,
+                "category.lovermods"
+        ));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) return;
 
-            if (!checkedForUpdates && client.currentScreen == null) {
+            if (!checkedForUpdates && client.currentScreen == null && config.isUpdateCheckerEnabled()) {
                 checkedForUpdates = true;
                 checkForUpdates(client);
             }
 
+            while (openConfigKey.wasPressed()) {
+                client.setScreen(new ConfigScreen(client.currentScreen, config));
+            }
+
             while (toggleKey.wasPressed()) {
-                NetherwartHighlighterClient.toggleEnabled();
+                boolean newState = !config.isNetherwartHighlightEnabled();
+                config.setNetherwartHighlightEnabled(newState);
+                config.save();
+
+                if (NetherwartHighlighterClient.isEnabled() != newState) {
+                    NetherwartHighlighterClient.toggleEnabled();
+                }
+
                 client.player.sendMessage(Text.literal("§6[LoverMods] Netherwart highlight "
-                        + (NetherwartHighlighterClient.isEnabled() ? "§aenabled" : "§cdisabled")), true);
+                        + (newState ? "§aenabled" : "§cdisabled")), true);
             }
 
             while (flipAxisKey.wasPressed()) {
-                NetherwartHighlighterClient.flipAxis();
+                boolean newState = !config.isHighlightAlongZ();
+                config.setHighlightAlongZ(newState);
+                config.save();
+
+                if (NetherwartHighlighterClient.isHighlightAlongZ() != newState) {
+                    NetherwartHighlighterClient.flipAxis();
+                }
+
                 client.player.sendMessage(Text.literal("§6[LoverMods] Rows run along "
-                        + (NetherwartHighlighterClient.isHighlightAlongZ()
-                        ? "§aZ axis (north-south)" : "§aX axis (east-west)")), true);
+                        + (newState ? "§aZ axis (north-south)" : "§aX axis (east-west)")), true);
             }
 
-            NetherwartHighlighterClient.tick(client);
+            if (config.isNetherwartHighlightEnabled()) {
+                NetherwartHighlighterClient.tick(client);
+            }
         });
 
-        WorldRenderEvents.AFTER_ENTITIES.register(NetherwartHighlighterClient::renderHighlights);
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            if (config.isNetherwartHighlightEnabled()) {
+                NetherwartHighlighterClient.renderHighlights(context);
+            }
+        });
+
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
+            ItemFrameSkinValueRenderer.renderItemFrameText(
+                    context.matrixStack(),
+                    context.consumers(),
+                    0xF000F0
+            );
+        });
     }
 
     private void checkForUpdates(MinecraftClient client) {
@@ -93,5 +140,15 @@ public class LovermodsClient implements ClientModInitializer {
                 });
             }
         });
+    }
+
+    public static ModConfig getConfig() {
+        return config;
+    }
+
+    public static void saveConfig() {
+        if (config != null) {
+            config.save();
+        }
     }
 }

@@ -24,7 +24,6 @@ public class SkinPriceManager {
     private static long lastUpdate = 0;
 
     public static void init() {
-        // Initial fetch - do it synchronously so data is ready immediately
         System.out.println("[LoverMods] ===== STARTING SKIN PRICE LOADING =====");
         System.out.println("[LoverMods] URL: " + GITHUB_JSON_URL);
 

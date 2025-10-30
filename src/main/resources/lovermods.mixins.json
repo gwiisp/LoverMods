@@ -8,7 +8,10 @@
   "client": [
     "PlayerListEntryMixin",
     "ItemStackMixin",
-    "SplashTextMixin"
+    "SplashTextMixin",
+    "TitleReceiveMixin",
+    "TitleScreenMixin",
+    "GenericContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

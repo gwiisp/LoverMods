@@ -8,7 +8,6 @@ public class Lovermods implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        // Register command
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             RefreshSkinsCommand.register(dispatcher);
         });

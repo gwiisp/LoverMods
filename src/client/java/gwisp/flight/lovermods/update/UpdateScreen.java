@@ -30,7 +30,6 @@ public class UpdateScreen extends Screen {
         int centerX = this.width / 2;
         int buttonY = this.height - 60;
 
-        // Download button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Download Update"),
                         button -> {
@@ -43,7 +42,6 @@ public class UpdateScreen extends Screen {
                 .build()
         );
 
-        // Skip button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Skip"),
                         button -> this.close())
@@ -56,7 +54,6 @@ public class UpdateScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        // Title
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
                 Text.literal("LoverMods Update Available!").formatted(net.minecraft.util.Formatting.YELLOW),
@@ -65,7 +62,6 @@ public class UpdateScreen extends Screen {
                 0xFFFFFF
         );
 
-        // Version info
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
                 Text.literal("Current: ").formatted(net.minecraft.util.Formatting.GRAY)
@@ -78,7 +74,6 @@ public class UpdateScreen extends Screen {
                 0xFFFFFF
         );
 
-        // Changelog header
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
                 Text.literal("What's New:").formatted(net.minecraft.util.Formatting.GOLD),
@@ -87,7 +82,6 @@ public class UpdateScreen extends Screen {
                 0xFFFFFF
         );
 
-        // Changelog content
         String changelog = updateInfo.getChangelog();
         if (changelog != null && !changelog.isEmpty()) {
             String[] lines = changelog.split("\n");
