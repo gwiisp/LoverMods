@@ -70,7 +70,7 @@ public class LovermodsClient implements ClientModInitializer {
         openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.lovermods.open_config",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_RIGHT_SHIFT,
+                GLFW.GLFW_KEY_M,
                 "category.lovermods"
         ));
 
