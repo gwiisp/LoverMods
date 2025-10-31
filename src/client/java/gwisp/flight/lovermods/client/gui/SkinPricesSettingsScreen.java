@@ -23,7 +23,7 @@ public class SkinPricesSettingsScreen extends Screen {
         int buttonWidth = 200;
         int buttonHeight = 20;
         int centerX = this.width / 2 - buttonWidth / 2;
-        int startY = 60;
+        int startY = 80;
         int spacing = 25;
         int currentY = startY;
 
@@ -65,7 +65,7 @@ public class SkinPricesSettingsScreen extends Screen {
                     button.setMessage(Text.literal("Show Set: " + (newState ? "§aON" : "§cOFF")));
                 }
         ).dimensions(centerX, currentY, buttonWidth, buttonHeight).build());
-        currentY += spacing + 10;
+        currentY += spacing + 30;
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Item Frame Prices: " + (config.isItemFrameSkinPricesEnabled() ? "§aON" : "§cOFF")),
@@ -125,19 +125,19 @@ public class SkinPricesSettingsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 30, 0xFFFFFF);
 
         context.drawCenteredTextWithShadow(this.textRenderer,
                 Text.literal("§7Configure what information appears in tooltips and item frames"),
-                this.width / 2, 40, 0xAAAAAA);
+                this.width / 2, 50, 0xAAAAAA);
 
         context.drawTextWithShadow(this.textRenderer,
                 Text.literal("§e§lTooltip Settings"),
-                this.width / 2 - 100, 47, 0xFFFFFF);
+                this.width / 2 - 100, 65, 0xFFFFFF);
 
         context.drawTextWithShadow(this.textRenderer,
                 Text.literal("§b§lItem Frame Settings"),
-                this.width / 2 - 100, 167, 0xFFFFFF);
+                this.width / 2 - 100, 190, 0xFFFFFF);
     }
 
     @Override

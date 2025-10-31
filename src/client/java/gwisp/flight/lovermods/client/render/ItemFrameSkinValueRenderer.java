@@ -64,22 +64,30 @@ public class ItemFrameSkinValueRenderer {
         textBuilder.append("§7)");
         String displayText = textBuilder.toString();
 
-        renderTextAboveEntity(matrices, vertexConsumers, client.textRenderer, displayText, itemFrame.getPos(), light);
+        renderTextAboveEntity(matrices, vertexConsumers, client.textRenderer, displayText, itemFrame, light);
     }
 
     private static void renderTextAboveEntity(MatrixStack matrices, VertexConsumerProvider vertexConsumers,
-                                              TextRenderer textRenderer, String text, Vec3d entityPos, int light) {
+                                              TextRenderer textRenderer, String text, ItemFrameEntity itemFrame, int light) {
         matrices.push();
 
         MinecraftClient client = MinecraftClient.getInstance();
         Vec3d camera = client.gameRenderer.getCamera().getPos();
 
+        Vec3d entityPos = itemFrame.getPos();
         double x = entityPos.x - camera.x;
         double y = entityPos.y - camera.y + 0.5;
         double z = entityPos.z - camera.z;
 
-        matrices.translate(x, y, z);
-        matrices.translate(0, 0, 0);
+        Vec3d offset = switch (itemFrame.getHorizontalFacing()) {
+            case NORTH -> new Vec3d(0, 0, -0.3);
+            case SOUTH -> new Vec3d(0, 0, 0.3);
+            case EAST  -> new Vec3d(0.3, 0, 0);
+            case WEST  -> new Vec3d(-0.3, 0, 0);
+            default -> Vec3d.ZERO;
+        };
+
+        matrices.translate(x + offset.x, y + offset.y, z + offset.z);
 
         float yaw = client.gameRenderer.getCamera().getYaw();
         float pitch = client.gameRenderer.getCamera().getPitch();
