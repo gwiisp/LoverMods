@@ -15,7 +15,7 @@ public class ModConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "lovermods.json");
 
-    private boolean netherwartHighlightEnabled = true;
+    private boolean netherwartHighlightEnabled = false;
     private boolean highlightAlongZ = true;
     private int highlightColor = 0xFF0000;
     private int scanRange = 100;
@@ -28,13 +28,13 @@ public class ModConfig {
 
     private boolean itemFrameSkinPricesEnabled = true;
     private boolean itemFrameRequireSneak = true;
-    private boolean itemFrameShowDemand = true;
-    private boolean itemFrameShowSeason = true;
-    private boolean itemFrameShowSet = true;
+    private boolean itemFrameShowDemand = false;
+    private boolean itemFrameShowSeason = false;
+    private boolean itemFrameShowSet = false;
 
     private List<String> dungeonPartyMembers = new ArrayList<>();
 
-    private boolean autoGgEnabled = true;
+    private boolean autoGgEnabled = false;
     private String rankupMessage = "GG";
 
     private boolean updateCheckerEnabled = true;
