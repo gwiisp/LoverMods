@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 
 @Mixin(TitleScreen.class)
@@ -36,59 +37,76 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Inject(method = "method_25426", at = @At("RETURN"))
     private void addLoverModsButtons(CallbackInfo ci) {
-        int buttonWidth = 60;
-        int buttonHeight = 20;
-        int x = 2;
-        int y = -10;
+        try {
+            int buttonWidth = 60;
+            int buttonHeight = 20;
+            int x = 2;
+            int y = -10;
 
-        discordButton = ButtonWidget.builder(
-                Text.literal("Discord"),
-                button -> Util.getOperatingSystem().open(URI.create(DISCORD_URL))
-        ).dimensions(x, y, buttonWidth, buttonHeight).build();
+            discordButton = ButtonWidget.builder(
+                    Text.literal("Discord"),
+                    button -> Util.getOperatingSystem().open(URI.create(DISCORD_URL))
+            ).dimensions(x, y, buttonWidth, buttonHeight).build();
 
-        githubButton = ButtonWidget.builder(
-                Text.literal("GitHub"),
-                button -> Util.getOperatingSystem().open(URI.create(GITHUB_URL))
-        ).dimensions(x + buttonWidth + 2, y, buttonWidth, buttonHeight).build();
+            githubButton = ButtonWidget.builder(
+                    Text.literal("GitHub"),
+                    button -> Util.getOperatingSystem().open(URI.create(GITHUB_URL))
+            ).dimensions(x + buttonWidth + 2, y, buttonWidth, buttonHeight).build();
 
-        this.addDrawableChild(discordButton);
-        this.addDrawableChild(githubButton);
+            this.addDrawableChild(discordButton);
+            this.addDrawableChild(githubButton);
 
-        int configButtonWidth = 200;
-        int configButtonHeight = 20;
-        int configX = this.width / 2 - 100;
-        int configY = this.height / 4 + 48 + 72 + 35;
+            int configButtonWidth = 200;
+            int configButtonHeight = 20;
+            int configX = this.width / 2 - 100;
+            int configY = this.height / 4 + 48 + 72 + 35;
 
-        ButtonWidget configButton = ButtonWidget.builder(
-                Text.literal("LoverMods Config"),
-                button -> {
-                    if (this.client != null) {
-                        this.client.setScreen(new ConfigScreen(this.client.currentScreen, LovermodsClient.getConfig()));
+            ButtonWidget configButton = ButtonWidget.builder(
+                    Text.literal("LoverMods Config"),
+                    button -> {
+                        if (this.client != null) {
+                            this.client.setScreen(new ConfigScreen(this.client.currentScreen, LovermodsClient.getConfig()));
+                        }
                     }
-                }
-        ).dimensions(configX, configY, configButtonWidth, configButtonHeight).build();
+            ).dimensions(configX, configY, configButtonWidth, configButtonHeight).build();
 
-        this.addDrawableChild(configButton);
+            this.addDrawableChild(configButton);
+        } catch (Exception e) {
+            System.err.println("[LoverMods] Failed to add buttons: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Inject(method = "method_25394", at = @At("RETURN"))
     private void renderLoverModsInfo(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        String version = FabricLoader.getInstance()
-                .getModContainer("lovermods")
-                .map(mod -> mod.getMetadata().getVersion().getFriendlyString())
-                .orElse("Unknown");
+        try {
+            String version = FabricLoader.getInstance()
+                    .getModContainer("lovermods")
+                    .map(mod -> mod.getMetadata().getVersion().getFriendlyString())
+                    .orElse("Unknown");
 
-        String text = "§6LoverMods §fv" + version;
+            Text versionText = Text.literal("§6LoverMods §fv" + version);
 
-        int x = 2;
-        int y = 25;
-
-        context.drawTextWithShadow(
-                this.textRenderer,
-                text,
-                x,
-                y,
-                0xFFFFFF
-        );
+            try {
+                // 1.21.7+ BECAUSE THIS SUCKS signature: drawText(TextRenderer, Text, int, int, int, boolean)
+                Method drawText = DrawContext.class.getMethod("drawText",
+                        net.minecraft.client.font.TextRenderer.class,
+                        Text.class,
+                        int.class, int.class, int.class, boolean.class);
+                drawText.invoke(context, this.textRenderer, versionText, 2, 25, 0xFFFFFF, true);
+            } catch (NoSuchMethodException e1) {
+                try {
+                    Method drawTextWithShadow = DrawContext.class.getMethod("drawTextWithShadow",
+                            net.minecraft.client.font.TextRenderer.class,
+                            Text.class,
+                            int.class, int.class, int.class);
+                    drawTextWithShadow.invoke(context, this.textRenderer, versionText, 2, 25, 0xFFFFFF);
+                } catch (Exception e2) {
+                    System.err.println("[LoverMods] Could not render version text, no compatible method found");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[LoverMods] Failed to render version text: " + e.getMessage());
+        }
     }
 }
