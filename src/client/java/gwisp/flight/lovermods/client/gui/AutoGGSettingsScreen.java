@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 
 public class AutoGGSettingsScreen extends Screen {
@@ -26,6 +27,28 @@ public class AutoGGSettingsScreen extends Screen {
         int centerX = this.width / 2 - fieldWidth / 2;
         int startY = 80;
 
+        TextWidget titleWidget = new TextWidget(
+                this.width / 2 - 100,
+                20,
+                200,
+                20,
+                this.title,
+                this.textRenderer
+        );
+        titleWidget.alignCenter();
+        this.addDrawableChild(titleWidget);
+
+        TextWidget descWidget = new TextWidget(
+                this.width / 2 - 150,
+                40,
+                300,
+                20,
+                Text.literal("§7Automatically send a message when someone ranks up"),
+                this.textRenderer
+        );
+        descWidget.alignCenter();
+        this.addDrawableChild(descWidget);
+
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Auto GG: " + (config.isAutoGgEnabled() ? "§aON" : "§cOFF")),
                 button -> {
@@ -35,10 +58,21 @@ public class AutoGGSettingsScreen extends Screen {
                 }
         ).dimensions(centerX, startY, fieldWidth, 20).build());
 
+        TextWidget labelWidget = new TextWidget(
+                this.width / 2 - 150,
+                startY + 40,
+                300,
+                20,
+                Text.literal("§eMessage to send:"),
+                this.textRenderer
+        );
+        labelWidget.alignCenter();
+        this.addDrawableChild(labelWidget);
+
         messageField = new TextFieldWidget(
                 this.textRenderer,
                 centerX,
-                startY + 40,
+                startY + 60,
                 fieldWidth,
                 20,
                 Text.literal("Rankup message")
@@ -57,15 +91,6 @@ public class AutoGGSettingsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("§7Automatically send a message when someone ranks up"),
-                this.width / 2, 40, 0xAAAAAA);
-
-        context.drawText(this.textRenderer,
-                "Message to send:",
-                this.width / 2 - 150, 110, 0xFFFFFF, false);
     }
 
     @Override

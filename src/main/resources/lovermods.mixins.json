@@ -11,7 +11,8 @@
     "SplashTextMixin",
     "TitleReceiveMixin",
     "TitleScreenMixin",
-    "GenericContainerScreenMixin"
+    "GenericContainerScreenMixin",
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

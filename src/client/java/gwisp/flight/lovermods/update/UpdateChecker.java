@@ -7,16 +7,20 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 public class UpdateChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger("LoverMods");
     private static final String MODRINTH_API = "https://api.modrinth.com/v2/project/AzKljFar/version";
     private static final String GITHUB_API = "https://api.github.com/repos/gwiisp/lovermods/releases/latest";
+    private static final Path SKIPPED_VERSION_FILE = FabricLoader.getInstance()
+            .getConfigDir()
+            .resolve("lovermods_skipped_update.txt");
 
     private static String latestVersion = null;
     private static String updateSummary = null;
@@ -34,12 +38,16 @@ public class UpdateChecker {
 
                 UpdateInfo modrinthUpdate = checkModrinth(currentVersion);
                 if (modrinthUpdate != null && modrinthUpdate.hasUpdate()) {
-                    return modrinthUpdate;
+                    if (!isVersionSkipped(modrinthUpdate.getLatestVersion())) {
+                        return modrinthUpdate;
+                    }
                 }
 
                 UpdateInfo githubUpdate = checkGitHub(currentVersion);
                 if (githubUpdate != null && githubUpdate.hasUpdate()) {
-                    return githubUpdate;
+                    if (!isVersionSkipped(githubUpdate.getLatestVersion())) {
+                        return githubUpdate;
+                    }
                 }
 
                 return new UpdateInfo(false, currentVersion, currentVersion, null, null);
@@ -48,6 +56,36 @@ public class UpdateChecker {
                 return null;
             }
         });
+    }
+
+    public static void skipVersion(String version) {
+        try {
+            Files.writeString(SKIPPED_VERSION_FILE, version);
+            LOGGER.info("Skipped update version: {}", version);
+        } catch (IOException e) {
+            LOGGER.error("Failed to save skipped version", e);
+        }
+    }
+
+    public static boolean isVersionSkipped(String version) {
+        try {
+            if (Files.exists(SKIPPED_VERSION_FILE)) {
+                String skippedVersion = Files.readString(SKIPPED_VERSION_FILE).trim();
+                return skippedVersion.equals(version);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to read skipped version", e);
+        }
+        return false;
+    }
+
+    public static void clearSkippedVersion() {
+        try {
+            Files.deleteIfExists(SKIPPED_VERSION_FILE);
+            LOGGER.info("Cleared skipped version");
+        } catch (IOException e) {
+            LOGGER.error("Failed to clear skipped version", e);
+        }
     }
 
     public static UpdateInfo checkModrinth(String currentVersion) {

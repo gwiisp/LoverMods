@@ -25,11 +25,12 @@ public class UpdateScreen extends Screen {
     protected void init() {
         super.init();
 
-        int buttonWidth = 200;
+        int buttonWidth = 150;
         int buttonHeight = 20;
         int centerX = this.width / 2;
         int buttonY = this.height - 60;
 
+        // Download button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Download Update"),
                         button -> {
@@ -38,14 +39,26 @@ public class UpdateScreen extends Screen {
                             }
                             this.close();
                         })
-                .dimensions(centerX - buttonWidth - 5, buttonY, buttonWidth, buttonHeight)
+                .dimensions(centerX - buttonWidth - 80, buttonY, buttonWidth, buttonHeight)
                 .build()
         );
 
+        // Skip this version button
         this.addDrawableChild(ButtonWidget.builder(
-                        Text.literal("Skip"),
+                        Text.literal("Skip This Version"),
+                        button -> {
+                            UpdateChecker.skipVersion(updateInfo.getLatestVersion());
+                            this.close();
+                        })
+                .dimensions(centerX - (buttonWidth / 2), buttonY, buttonWidth, buttonHeight)
+                .build()
+        );
+
+        // Remind me later button
+        this.addDrawableChild(ButtonWidget.builder(
+                        Text.literal("Remind Me Later"),
                         button -> this.close())
-                .dimensions(centerX + 5, buttonY, buttonWidth, buttonHeight)
+                .dimensions(centerX + 80, buttonY, buttonWidth, buttonHeight)
                 .build()
         );
     }

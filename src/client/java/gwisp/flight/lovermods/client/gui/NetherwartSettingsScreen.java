@@ -11,6 +11,12 @@ public class NetherwartSettingsScreen extends Screen {
     private final Screen parent;
     private final ModConfig config;
 
+    private ButtonWidget enabledButton;
+    private ButtonWidget axisButton;
+    private ButtonWidget colorButton;
+    private ButtonWidget scanRangeButton;
+    private ButtonWidget minRowWidthButton;
+
     public NetherwartSettingsScreen(Screen parent, ModConfig config) {
         super(Text.literal("Netherwart Highlight Settings"));
         this.parent = parent;
@@ -27,7 +33,7 @@ public class NetherwartSettingsScreen extends Screen {
         int startY = 60;
         int spacing = 25;
 
-        this.addDrawableChild(ButtonWidget.builder(
+        enabledButton = this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Enabled: " + (config.isNetherwartHighlightEnabled() ? "§aON" : "§cOFF")),
                 button -> {
                     boolean newState = !config.isNetherwartHighlightEnabled();
@@ -39,7 +45,7 @@ public class NetherwartSettingsScreen extends Screen {
                 }
         ).dimensions(centerX, startY, buttonWidth, buttonHeight).build());
 
-        this.addDrawableChild(ButtonWidget.builder(
+        axisButton = this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Axis: " + (config.isHighlightAlongZ() ? "Z (North-South)" : "X (East-West)")),
                 button -> {
                     boolean newState = !config.isHighlightAlongZ();
@@ -51,17 +57,16 @@ public class NetherwartSettingsScreen extends Screen {
                 }
         ).dimensions(centerX, startY + spacing, buttonWidth, buttonHeight).build());
 
-        this.addDrawableChild(ButtonWidget.builder(
+        colorButton = this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Color: " + getColorName(config.getHighlightColor())),
                 button -> {
-                    int currentColor = config.getHighlightColor();
-                    int newColor = getNextColor(currentColor);
+                    int newColor = getNextColor(config.getHighlightColor());
                     config.setHighlightColor(newColor);
                     button.setMessage(Text.literal("Color: " + getColorName(newColor)));
                 }
         ).dimensions(centerX, startY + spacing * 2, buttonWidth, buttonHeight).build());
 
-        this.addDrawableChild(ButtonWidget.builder(
+        scanRangeButton = this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Scan Range: " + config.getScanRange() + " blocks"),
                 button -> {}
         ).dimensions(centerX, startY + spacing * 3, buttonWidth, buttonHeight).build());
@@ -70,7 +75,7 @@ public class NetherwartSettingsScreen extends Screen {
                 Text.literal("-10"),
                 button -> {
                     config.setScanRange(config.getScanRange() - 10);
-                    this.clearAndInit();
+                    scanRangeButton.setMessage(Text.literal("Scan Range: " + config.getScanRange() + " blocks"));
                 }
         ).dimensions(centerX - 55, startY + spacing * 4, 50, buttonHeight).build());
 
@@ -78,11 +83,11 @@ public class NetherwartSettingsScreen extends Screen {
                 Text.literal("+10"),
                 button -> {
                     config.setScanRange(config.getScanRange() + 10);
-                    this.clearAndInit();
+                    scanRangeButton.setMessage(Text.literal("Scan Range: " + config.getScanRange() + " blocks"));
                 }
         ).dimensions(centerX + buttonWidth + 5, startY + spacing * 4, 50, buttonHeight).build());
 
-        this.addDrawableChild(ButtonWidget.builder(
+        minRowWidthButton = this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Min Row Width: " + config.getMinRowWidth() + " warts"),
                 button -> {}
         ).dimensions(centerX, startY + spacing * 5, buttonWidth, buttonHeight).build());
@@ -91,7 +96,7 @@ public class NetherwartSettingsScreen extends Screen {
                 Text.literal("-1"),
                 button -> {
                     config.setMinRowWidth(config.getMinRowWidth() - 1);
-                    this.clearAndInit();
+                    minRowWidthButton.setMessage(Text.literal("Min Row Width: " + config.getMinRowWidth() + " warts"));
                 }
         ).dimensions(centerX - 55, startY + spacing * 6, 50, buttonHeight).build());
 
@@ -99,7 +104,7 @@ public class NetherwartSettingsScreen extends Screen {
                 Text.literal("+1"),
                 button -> {
                     config.setMinRowWidth(config.getMinRowWidth() + 1);
-                    this.clearAndInit();
+                    minRowWidthButton.setMessage(Text.literal("Min Row Width: " + config.getMinRowWidth() + " warts"));
                 }
         ).dimensions(centerX + buttonWidth + 5, startY + spacing * 6, 50, buttonHeight).build());
 

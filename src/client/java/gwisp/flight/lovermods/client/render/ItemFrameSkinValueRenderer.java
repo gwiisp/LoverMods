@@ -76,7 +76,7 @@ public class ItemFrameSkinValueRenderer {
 
         Vec3d entityPos = itemFrame.getPos();
         double x = entityPos.x - camera.x;
-        double y = entityPos.y - camera.y + 0.5;
+        double y = entityPos.y - camera.y + 0.45;
         double z = entityPos.z - camera.z;
 
         Vec3d offset = switch (itemFrame.getHorizontalFacing()) {
@@ -97,11 +97,54 @@ public class ItemFrameSkinValueRenderer {
 
         matrices.scale(-0.025f, -0.025f, 0.025f);
 
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
-        float xOffset = -textRenderer.getWidth(text) / 2f;
+        try {
+            Matrix4f matrix = matrices.peek().getPositionMatrix();
+            float xOffset = -textRenderer.getWidth(text) / 2f;
 
-        textRenderer.draw(text, xOffset, 0, 0xFFFFFF, false, matrix, vertexConsumers,
-                TextRenderer.TextLayerType.NORMAL, 0x00000000, light);
+            System.out.println("Rendering: " + text + " at offset " + xOffset);
+
+            java.lang.reflect.Method drawMethod = TextRenderer.class.getDeclaredMethod(
+                    "method_27522",
+                    Text.class,
+                    float.class,
+                    float.class,
+                    int.class,
+                    boolean.class,
+                    Matrix4f.class,
+                    VertexConsumerProvider.class,
+                    TextRenderer.TextLayerType.class,
+                    int.class,
+                    int.class
+            );
+
+            for (TextRenderer.TextLayerType layerType : new TextRenderer.TextLayerType[] {
+                    TextRenderer.TextLayerType.SEE_THROUGH,
+                    TextRenderer.TextLayerType.NORMAL
+            }) {
+                try {
+                    drawMethod.invoke(
+                            textRenderer,
+                            Text.literal(text),
+                            xOffset,
+                            0f,
+                            0xFF00FF00,
+                            false,
+                            matrix,
+                            vertexConsumers,
+                            layerType,
+                            0,
+                            0xF000F0
+                    );
+                    System.out.println("Drew with " + layerType);
+                } catch (Exception e) {
+                    System.err.println("Failed with " + layerType + ": " + e.getMessage());
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error rendering item frame text: " + e.getMessage());
+            e.printStackTrace();
+        }
 
         matrices.pop();
     }

@@ -124,6 +124,19 @@ public class TradeOverlay {
         renderTradeOverlay(context, yourItems, yourMoney, client, leftX, leftY, "§6§lYour Offer", true);
     }
 
+    private static void drawText(DrawContext context, MinecraftClient client, String text, int x, int y) {
+        net.minecraft.client.gui.widget.TextWidget tempWidget = new net.minecraft.client.gui.widget.TextWidget(
+                x,
+                y,
+                client.textRenderer.getWidth(text),
+                10,
+                Text.literal(text),
+                client.textRenderer
+        );
+
+        tempWidget.render(context, 0, 0, 0);
+    }
+
     private static void renderTradeOverlay(DrawContext context, List<TradeItem> items, long money, MinecraftClient client, int x, int y, String title, boolean alignRight) {
         if (items.isEmpty() && money == 0) return;
 
@@ -146,22 +159,21 @@ public class TradeOverlay {
         }
 
         int titleX = alignRight ? x - maxWidth : x;
-        context.drawTextWithShadow(client.textRenderer, title, titleX, currentY, 0xFFFFFF);
+        drawText(context, client, title, titleX, currentY);
         currentY += LINE_HEIGHT + 2;
 
-       /* if (money > 0) {
+        /* if (money > 0) {
             String moneyText = "§a$" + formatNumber(money);
             int moneyX = alignRight ? x - client.textRenderer.getWidth(moneyText) : x;
-            context.drawTextWithShadow(client.textRenderer, moneyText, moneyX, currentY, 0xFFFFFF);
+            drawText(context, client, moneyText, moneyX, currentY);
             currentY += LINE_HEIGHT;
         }
-
         */
 
         for (TradeItem item : items) {
             String displayText = formatTradeItem(item);
             int itemX = alignRight ? x - client.textRenderer.getWidth(displayText) : x;
-            context.drawTextWithShadow(client.textRenderer, displayText, itemX, currentY, 0xFFFFFF);
+            drawText(context, client, displayText, itemX, currentY);
             currentY += LINE_HEIGHT;
         }
 
@@ -170,7 +182,7 @@ public class TradeOverlay {
             currentY += 3;
             String totalText = "§e§lTotal Value: §f" + formatValue(totalValue);
             int totalX = alignRight ? x - client.textRenderer.getWidth(totalText) : x;
-            context.drawTextWithShadow(client.textRenderer, totalText, totalX, currentY, 0xFFFFFF);
+            drawText(context, client, totalText, totalX, currentY);
         }
     }
 

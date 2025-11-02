@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ public class DungeonSettingsScreen extends Screen {
     private final Screen parent;
     private final ModConfig config;
     private final List<PlayerSlot> playerSlots = new ArrayList<>();
+
+    private TextWidget titleWidget;
+    private TextWidget descWidget;
+    private TextWidget countWidget;
 
     public DungeonSettingsScreen(Screen parent, ModConfig config) {
         super(Text.literal("Dungeon Mods Settings"));
@@ -33,13 +38,26 @@ public class DungeonSettingsScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-
         this.clearChildren();
 
         int fieldWidth = 180;
         int centerX = this.width / 2;
         int startY = 70;
         int spacing = 30;
+
+        titleWidget = new TextWidget(0, 20, this.width, 20, this.title, this.textRenderer);
+        titleWidget.alignCenter();
+        this.addDrawableChild(titleWidget);
+
+        descWidget = new TextWidget(0, 40, this.width, 20,
+                Text.literal("§7Configure up to 5 players for /dunginv"), this.textRenderer);
+        descWidget.alignCenter();
+        this.addDrawableChild(descWidget);
+
+        countWidget = new TextWidget(0, 55, this.width,
+                20, Text.literal("§7Players: " + playerSlots.size() + "/5"), this.textRenderer);
+        countWidget.alignCenter();
+        this.addDrawableChild(countWidget);
 
         for (int i = 0; i < playerSlots.size(); i++) {
             final int index = i;
@@ -57,17 +75,13 @@ public class DungeonSettingsScreen extends Screen {
             textField.setMaxLength(16);
             textField.setText(slot.playerName);
             textField.setPlaceholder(Text.literal("Enter player name"));
-            textField.setChangedListener(text -> {
-                slot.playerName = text;
-            });
+            textField.setChangedListener(text -> slot.playerName = text);
             slot.textField = textField;
             this.addDrawableChild(textField);
 
             ButtonWidget deleteButton = ButtonWidget.builder(
                     Text.literal("§cX"),
-                    button -> {
-                        removePlayerSlot(index);
-                    }
+                    button -> removePlayerSlot(index)
             ).dimensions(centerX + fieldWidth / 2 + 5, y, 20, 20).build();
             this.addDrawableChild(deleteButton);
         }
@@ -76,14 +90,11 @@ public class DungeonSettingsScreen extends Screen {
             int addButtonY = startY + (playerSlots.size() * spacing);
             this.addDrawableChild(ButtonWidget.builder(
                     Text.literal("+ Add Player"),
-                    button -> {
-                        addPlayerSlot();
-                    }
+                    button -> addPlayerSlot()
             ).dimensions(centerX - 90, addButtonY, 180, 20).build());
         }
 
         int bottomY = this.height - 30;
-
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Test Invites"),
                 button -> {
@@ -104,9 +115,7 @@ public class DungeonSettingsScreen extends Screen {
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Back"),
-                button -> {
-                    this.close();
-                }
+                button -> this.close()
         ).dimensions(centerX + 5, bottomY, 95, 20).build());
     }
 
@@ -130,30 +139,20 @@ public class DungeonSettingsScreen extends Screen {
         List<String> players = new ArrayList<>();
         for (PlayerSlot slot : playerSlots) {
             String name = slot.playerName.trim();
-            if (!name.isEmpty()) {
-                players.add(name);
-            }
+            if (!name.isEmpty()) players.add(name);
         }
-        if (players.size() > 5) {
-            players = players.subList(0, 5);
-        }
+        if (players.size() > 5) players = players.subList(0, 5);
         config.setDungeonPartyMembers(players);
         config.save();
+
+        if (countWidget != null) {
+            countWidget.setMessage(Text.literal("§7Players: " + players.size() + "/5"));
+        }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
-
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("§7Configure up to 5 players for /dunginv"),
-                this.width / 2, 40, 0xAAAAAA);
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("§7Players: " + playerSlots.size() + "/5"),
-                this.width / 2, 55, 0xAAAAAA);
     }
 
     @Override

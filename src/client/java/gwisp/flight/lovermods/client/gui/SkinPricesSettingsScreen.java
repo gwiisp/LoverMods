@@ -1,14 +1,20 @@
 package gwisp.flight.lovermods.client.gui;
 
 import gwisp.flight.lovermods.config.ModConfig;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
+import net.minecraft.client.gui.DrawContext;
 
 public class SkinPricesSettingsScreen extends Screen {
     private final Screen parent;
     private final ModConfig config;
+
+    private TextWidget titleWidget;
+    private TextWidget tooltipHeaderWidget;
+    private TextWidget itemFrameHeaderWidget;
+    private TextWidget descriptionWidget;
 
     public SkinPricesSettingsScreen(Screen parent, ModConfig config) {
         super(Text.literal("Skin Prices Settings"));
@@ -26,6 +32,24 @@ public class SkinPricesSettingsScreen extends Screen {
         int startY = 80;
         int spacing = 25;
         int currentY = startY;
+
+        titleWidget = new TextWidget(0, 30, this.width, 20, this.title, this.textRenderer);
+        titleWidget.alignCenter();
+        this.addDrawableChild(titleWidget);
+
+        descriptionWidget = new TextWidget(0, 50, this.width, 20,
+                Text.literal("§7Configure what information appears in tooltips and item frames"),
+                this.textRenderer);
+        descriptionWidget.alignCenter();
+        this.addDrawableChild(descriptionWidget);
+
+        tooltipHeaderWidget = new TextWidget(centerX - 100, 65, 200, 20,
+                Text.literal("§e§lTooltip Settings"), this.textRenderer);
+        this.addDrawableChild(tooltipHeaderWidget);
+
+        itemFrameHeaderWidget = new TextWidget(centerX - 100, 190, 200, 20,
+                Text.literal("§b§lItem Frame Settings"), this.textRenderer);
+        this.addDrawableChild(itemFrameHeaderWidget);
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Show Skin Prices: " + (config.isSkinPricesEnabled() ? "§aON" : "§cOFF")),
@@ -125,19 +149,6 @@ public class SkinPricesSettingsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 30, 0xFFFFFF);
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("§7Configure what information appears in tooltips and item frames"),
-                this.width / 2, 50, 0xAAAAAA);
-
-        context.drawTextWithShadow(this.textRenderer,
-                Text.literal("§e§lTooltip Settings"),
-                this.width / 2 - 100, 65, 0xFFFFFF);
-
-        context.drawTextWithShadow(this.textRenderer,
-                Text.literal("§b§lItem Frame Settings"),
-                this.width / 2 - 100, 190, 0xFFFFFF);
     }
 
     @Override
