@@ -30,7 +30,6 @@ public class UpdateScreen extends Screen {
         int centerX = this.width / 2;
         int buttonY = this.height - 60;
 
-        // Download button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Download Update"),
                         button -> {
@@ -43,7 +42,6 @@ public class UpdateScreen extends Screen {
                 .build()
         );
 
-        // Skip this version button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Skip This Version"),
                         button -> {
@@ -54,7 +52,6 @@ public class UpdateScreen extends Screen {
                 .build()
         );
 
-        // Remind me later button
         this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("Remind Me Later"),
                         button -> this.close())
