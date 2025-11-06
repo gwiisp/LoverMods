@@ -1,3 +1,5 @@
+![LoverMods](https://cdn.modrinth.com/data/cached_images/a722f3b91f550c2f56c23d1cc41b4a196b9f72ca.png)
+
 # LoverMods
 
 **LoverMods** is a feature-rich companion mod built to enhance the overall **LoverCraft** experience all the way from farming to trading. It brings together quality-of-life, cosmetic and informational features that make gameplay smoother, clearer and more rewarding, all without breaking the vanilla balance.
