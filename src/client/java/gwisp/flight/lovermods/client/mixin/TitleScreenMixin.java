@@ -2,11 +2,15 @@ package gwisp.flight.lovermods.client.mixin;
 
 import gwisp.flight.lovermods.client.LovermodsClient;
 import gwisp.flight.lovermods.client.gui.ConfigScreen;
+import gwisp.flight.lovermods.client.gui.NewsDetailScreen;
+import gwisp.flight.lovermods.client.news.NewsManager;
+import gwisp.flight.lovermods.client.news.NewsWidget;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +18,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.gui.widget.TextWidget;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.net.URI;
 
@@ -30,6 +34,9 @@ public abstract class TitleScreenMixin extends Screen {
     private ButtonWidget discordButton;
     @Unique
     private ButtonWidget githubButton;
+
+    @Unique
+    private final NewsWidget newsWidget = new NewsWidget();
 
     protected TitleScreenMixin(Text title) {
         super(title);
@@ -70,6 +77,17 @@ public abstract class TitleScreenMixin extends Screen {
         ).dimensions(configX, configY, configButtonWidth, configButtonHeight).build();
 
         this.addDrawableChild(configButton);
+
+        ButtonWidget achievementsButton = ButtonWidget.builder(
+                Text.literal("🏆 Achievements"),
+                button -> {
+                    if (this.client != null) {
+                        this.client.setScreen(new gwisp.flight.lovermods.client.gui.AchievementsScreen((Screen)(Object)this));
+                    }
+                }
+        ).dimensions(configX, configY + 25, configButtonWidth, configButtonHeight).build();
+
+        this.addDrawableChild(achievementsButton);
     }
 
     @Inject(method = "method_25394", at = @At("RETURN"))
@@ -91,5 +109,29 @@ public abstract class TitleScreenMixin extends Screen {
         );
 
         textWidget.render(context, mouseX, mouseY, delta);
+
+        if (NewsManager.isLoaded() && NewsManager.getArticleCount() > 0) {
+            newsWidget.render(context, this.width, this.height, mouseX, mouseY);
+        }
+    }
+
+    @Inject(method = "method_25402", at = @At("HEAD"), cancellable = true)
+    private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        if (NewsManager.isLoaded() && NewsManager.getArticleCount() > 0) {
+            if (newsWidget.mouseClicked(this.width, this.height, mouseX, mouseY, button)) {
+                gwisp.flight.lovermods.client.achievements.AchievementManager.onNewsClicked();
+
+                var articles = NewsManager.getArticles();
+                if (!articles.isEmpty()) {
+                    int currentIndex = newsWidget.getCurrentIndex();
+                    NewsManager.NewsArticle currentArticle = articles.get(currentIndex);
+
+                    if (this.client != null) {
+                        this.client.setScreen(new NewsDetailScreen((Screen)(Object)this, currentArticle));
+                    }
+                }
+                cir.setReturnValue(true);
+            }
+        }
     }
 }

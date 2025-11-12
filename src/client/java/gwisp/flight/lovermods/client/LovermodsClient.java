@@ -7,6 +7,8 @@ import gwisp.flight.lovermods.client.gui.ConfigScreen;
 import gwisp.flight.lovermods.client.render.ItemFrameSkinValueRenderer;
 import gwisp.flight.lovermods.client.splash.SplashTextManager;
 import gwisp.flight.lovermods.config.ModConfig;
+import gwisp.flight.lovermods.client.news.NewsManager;
+import gwisp.flight.lovermods.skins.SkinPriceManager;
 import gwisp.flight.lovermods.update.UpdateChecker;
 import gwisp.flight.lovermods.update.UpdateScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -19,8 +21,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
-import gwisp.flight.lovermods.skins.SkinPriceManager;
 import org.lwjgl.glfw.GLFW;
+
 
 public class LovermodsClient implements ClientModInitializer {
 
@@ -29,11 +31,15 @@ public class LovermodsClient implements ClientModInitializer {
     private static KeyBinding flipAxisKey;
     private static KeyBinding openConfigKey;
     private static boolean checkedForUpdates = false;
+    private static int modPresenceTickCounter = 0;
 
     @Override
     public void onInitializeClient() {
         config = ModConfig.load();
         System.out.println("[LoverMods] Config loaded successfully");
+
+        NewsManager.loadNews();
+        System.out.println("[LoverMods] Loading news articles...");
 
         SkinPriceManager.init();
         System.out.println("[LoverMods] Skins loaded: " + SkinPriceManager.getSkinCount());
@@ -46,11 +52,6 @@ public class LovermodsClient implements ClientModInitializer {
             ClientRefreshSkinsCommand.register(dispatcher);
             ConfigCommand.register(dispatcher, config);
             gwisp.flight.lovermods.client.commands.DungeonInviteCommand.register(dispatcher, config);
-        });
-
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            System.out.println("[LoverMods] Joined server/world, refreshing cosmetics...");
-            CosmeticManager.loadCosmetics();
         });
 
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(

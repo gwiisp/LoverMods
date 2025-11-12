@@ -41,6 +41,8 @@ public class ModConfig {
 
     private boolean tradeHudEnabled = true;
 
+    private boolean mcmmoTrackerEnabled = true;
+
     private boolean maxedItemHighlightEnabled = true;
     private int maxedItemHighlightColor = 0x8800FF00;
     public boolean isNetherwartHighlightEnabled() {
@@ -201,6 +203,14 @@ public class ModConfig {
 
     public void setMaxedItemHighlightEnabled(boolean enabled) {
         this.maxedItemHighlightEnabled = enabled;
+    }
+
+    public boolean isMcmmoTrackerEnabled() {
+        return mcmmoTrackerEnabled;
+    }
+
+    public void setMcmmoTrackerEnabled(boolean enabled) {
+        this.mcmmoTrackerEnabled = enabled;
     }
 
     public void save() {

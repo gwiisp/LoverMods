@@ -12,7 +12,11 @@
     "TitleReceiveMixin",
     "TitleScreenMixin",
     "GenericContainerScreenMixin",
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "GameMenuScreenMixin",
+    "InGameHudMixin",
+    "BossBarHudAccessor",
+    "ClientPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

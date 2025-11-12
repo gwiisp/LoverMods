@@ -1,6 +1,7 @@
 package gwisp.flight.lovermods.client.gui;
 
 import gwisp.flight.lovermods.client.LovermodsClient;
+import gwisp.flight.lovermods.client.achievements.AchievementManager;
 import gwisp.flight.lovermods.skins.SkinData;
 import gwisp.flight.lovermods.skins.SkinPriceManager;
 import net.minecraft.client.MinecraftClient;
@@ -36,6 +37,8 @@ public class TradeOverlay {
         if (!title.toLowerCase().contains("trading")) {
             return;
         }
+
+        AchievementManager.onTradeMenuOpened();
 
         List<TradeItem> theirItems = new ArrayList<>();
         List<TradeItem> yourItems = new ArrayList<>();

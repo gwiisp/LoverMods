@@ -40,13 +40,22 @@ public class MiscSettingsScreen extends Screen {
         this.addDrawableChild(descWidget);
 
         this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("MCMMO Tracker: " + (config.isMcmmoTrackerEnabled() ? "§aON" : "§cOFF")),
+                button -> {
+                    boolean newState = !config.isMcmmoTrackerEnabled();
+                    config.setMcmmoTrackerEnabled(newState);
+                    button.setMessage(Text.literal("MCMMO Tracker: " + (newState ? "§aON" : "§cOFF")));
+                }
+        ).dimensions(centerX, startY, buttonWidth, buttonHeight).build());
+
+        this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Update Checker: " + (config.isUpdateCheckerEnabled() ? "§aON" : "§cOFF")),
                 button -> {
                     boolean newState = !config.isUpdateCheckerEnabled();
                     config.setUpdateCheckerEnabled(newState);
                     button.setMessage(Text.literal("Update Checker: " + (newState ? "§aON" : "§cOFF")));
                 }
-        ).dimensions(centerX, startY, buttonWidth, buttonHeight).build());
+        ).dimensions(centerX, startY + spacing, buttonWidth, buttonHeight).build());
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Trade HUD: " + (config.isTradeHudEnabled() ? "§aON" : "§cOFF")),
@@ -55,16 +64,16 @@ public class MiscSettingsScreen extends Screen {
                     config.setTradeHudEnabled(newState);
                     button.setMessage(Text.literal("Trade HUD: " + (newState ? "§aON" : "§cOFF")));
                 }
-        ).dimensions(centerX, startY + spacing, buttonWidth, buttonHeight).build());
+        ).dimensions(centerX, startY + spacing * 2, buttonWidth, buttonHeight).build());
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Maxed Rune Highlight: " + (config.isMaxedItemHighlightEnabled() ? "§aON" : "§cOFF")),
                 button -> {
                     boolean newState = !config.isMaxedItemHighlightEnabled();
                     config.setMaxedItemHighlightEnabled(newState);
-                    button.setMessage(Text.literal("Maxed Rune Highlight: " + (newState ? "COMING SOON" : "COMING SOON")));
+                    button.setMessage(Text.literal("Maxed Rune Highlight: " + (newState ? "§aON" : "§cOFF")));
                 }
-        ).dimensions(centerX, startY + spacing * 2, buttonWidth, buttonHeight).build());
+        ).dimensions(centerX, startY + spacing * 3, buttonWidth, buttonHeight).build());
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Back"),
