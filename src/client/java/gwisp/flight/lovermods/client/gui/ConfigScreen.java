@@ -70,14 +70,20 @@ public class ConfigScreen extends Screen {
         ).dimensions(centerX, startY + spacing * 3, buttonWidth, buttonHeight).build());
 
         this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("Performance Settings"),
+                button -> this.client.setScreen(new PerformanceSettingsScreen(this, config))
+        ).dimensions(centerX, startY + spacing * 4, buttonWidth, buttonHeight).build());
+
+        this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Misc"),
                 button -> this.client.setScreen(new MiscSettingsScreen(this, config))
-        ).dimensions(centerX, startY + spacing * 4, buttonWidth, buttonHeight).build());
+        ).dimensions(centerX, startY + spacing * 5, buttonWidth, buttonHeight).build());
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Done"),
                 button -> this.close()
         ).dimensions(this.width / 2 - 100, this.height - 30, 200, 20).build());
+
     }
 
     @Override

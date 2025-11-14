@@ -17,7 +17,8 @@
     "InGameHudMixin",
     "BossBarHudAccessor",
     "ClientPlayNetworkHandlerMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "ItemFrameRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

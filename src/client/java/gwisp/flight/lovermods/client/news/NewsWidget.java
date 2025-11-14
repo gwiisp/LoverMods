@@ -46,6 +46,10 @@ public class NewsWidget {
         List<NewsManager.NewsArticle> articles = NewsManager.getArticles();
         if (articles.isEmpty()) return;
 
+        if (currentIndex >= articles.size()) {
+            currentIndex = 0;
+        }
+
         int widgetWidth = (int)(screenWidth * BASE_SCALE);
         int widgetHeight = (int)(widgetWidth * 0.64f);
         int imageHeight = (int)(widgetHeight * IMAGE_RATIO);
@@ -85,6 +89,10 @@ public class NewsWidget {
 
         context.fill(x, y, x + widgetWidth, y + widgetHeight, 0xE0000000);
         context.drawBorder(x, y, widgetWidth, widgetHeight, 0xFF444444);
+
+        if (currentIndex >= articles.size()) {
+            currentIndex = 0;
+        }
 
         NewsManager.NewsArticle current = articles.get(currentIndex);
 
@@ -166,6 +174,10 @@ public class NewsWidget {
         List<NewsManager.NewsArticle> articles = NewsManager.getArticles();
         if (articles.isEmpty()) return false;
 
+        if (currentIndex >= articles.size()) {
+            currentIndex = 0;
+        }
+
         int widgetWidth = (int)(screenWidth * BASE_SCALE);
         int widgetHeight = (int)(widgetWidth * 0.64f);
 
@@ -198,7 +210,12 @@ public class NewsWidget {
     }
 
     public void setCurrentIndex(int index) {
-        this.currentIndex = index;
+        List<NewsManager.NewsArticle> articles = NewsManager.getArticles();
+        if (!articles.isEmpty() && index >= 0 && index < articles.size()) {
+            this.currentIndex = index;
+        } else {
+            this.currentIndex = 0;
+        }
         this.lastAutoSwitchTime = System.currentTimeMillis();
     }
 

@@ -56,6 +56,11 @@ public class LovermodsClient implements ClientModInitializer {
             gwisp.flight.lovermods.client.commands.DungeonInviteCommand.register(dispatcher, config);
         });
 
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            System.out.println("[LoverMods] Joined server/world, refreshing cosmetics...");
+            CosmeticManager.loadCosmetics();
+        });
+
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.lovermods.toggle_highlight",
                 InputUtil.Type.KEYSYM,

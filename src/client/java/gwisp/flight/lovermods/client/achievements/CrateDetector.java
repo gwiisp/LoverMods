@@ -2,119 +2,107 @@ package gwisp.flight.lovermods.client.achievements;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CrateDetector {
-    private static String lastDetectedCrate = null;
+    private static String lastCrateType = null;
+    private static final Set<String> detectedCratesThisSession = new HashSet<>();
+    private static final Pattern REMOVE_PATTERN = Pattern.compile("Remove\\s+(\\d+)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern CRATE_PATTERN = Pattern.compile("Opens a (.+?) Crate", Pattern.CASE_INSENSITIVE);
-
-    /**
-     * Call this when a slot is clicked in a container
-     */
     public static void onSlotClick(Slot slot) {
-        if (slot == null) return;
+        if (slot == null || slot.getStack().isEmpty()) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.currentScreen == null) {
-            return;
-        }
-
-        ItemStack stack = slot.getStack();
-        if (stack.isEmpty()) return;
+        if (client.player == null || client.currentScreen == null) return;
 
         String screenTitle = client.currentScreen.getTitle().getString();
 
-        if (!screenTitle.toLowerCase().contains("bulk") &&
-                !screenTitle.toLowerCase().contains("crate")) {
+        if (screenTitle.contains("BULK OPENING")) {
+            ItemStack clickedStack = slot.getStack();
+            String itemName = clickedStack.getName().getString();
+
+            if (itemName.toLowerCase().contains("key")) {
+                int bulkAmount = detectBulkAmount(slot);
+
+                System.out.println("[CrateDetector] Bulk opening detected: " + bulkAmount + "x " + itemName);
+
+                for (int i = 0; i < bulkAmount; i++) {
+                    AchievementManager.onCrateOpened(itemName);
+                }
+
+                lastCrateType = itemName;
+            }
             return;
         }
 
-        String crateType = getCrateTypeFromTooltip(stack);
+        if (!screenTitle.toLowerCase().contains("crate")) return;
 
-        if (crateType != null && !crateType.equals(lastDetectedCrate)) {
-            System.out.println("[LoverMods] Clicked on crate: " + crateType);
-            AchievementManager.onCrateOpened(crateType);
-            lastDetectedCrate = crateType;
+        ItemStack stack = slot.getStack();
+        String itemName = stack.getName().getString();
+
+        if (itemName.toLowerCase().contains("crate")) {
+            if (!itemName.equals(lastCrateType)) {
+                if (!detectedCratesThisSession.contains(itemName)) {
+                    AchievementManager.onCrateOpened(itemName);
+                    detectedCratesThisSession.add(itemName);
+                    lastCrateType = itemName;
+                    System.out.println("[CrateDetector] Crate opened: " + itemName);
+                }
+            }
         }
     }
 
-    /**
-     * Alternative: Call this when you detect a crate key in the middle slot
-     */
-    public static void checkMiddleSlotForCrate() {
+    private static int detectBulkAmount(Slot keySlot) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.currentScreen == null) {
-            return;
-        }
+        if (client.currentScreen == null) return 1;
 
         ScreenHandler handler = client.player.currentScreenHandler;
-        if (handler == null || handler.slots.size() < 14) {
-            return;
-        }
+        int keySlotIndex = keySlot.getIndex();
 
-        Slot middleSlot = handler.slots.get(13);
-        ItemStack stack = middleSlot.getStack();
-
-        if (!stack.isEmpty()) {
-            String crateType = getCrateTypeFromTooltip(stack);
-            if (crateType != null) {
-                System.out.println("[LoverMods] Found crate key in middle slot: " + crateType);
+        int checkSlot3Left = keySlotIndex - 3;
+        if (checkSlot3Left >= 0 && checkSlot3Left < handler.slots.size()) {
+            Slot slot3Left = handler.slots.get(checkSlot3Left);
+            if (!slot3Left.getStack().isEmpty()) {
+                int amount = parseRemoveAmount(slot3Left.getStack());
+                if (amount > 0) {
+                    return amount + 1;
+                }
             }
         }
+
+        int checkSlot2Left = keySlotIndex - 2;
+        if (checkSlot2Left >= 0 && checkSlot2Left < handler.slots.size()) {
+            Slot slot2Left = handler.slots.get(checkSlot2Left);
+            if (!slot2Left.getStack().isEmpty()) {
+                int amount = parseRemoveAmount(slot2Left.getStack());
+                if (amount > 0) {
+                    return amount + 1;
+                }
+            }
+        }
+
+        return 1;
     }
 
-    /**
-     * Extract crate type from item tooltip
-     */
-    private static String getCrateTypeFromTooltip(ItemStack stack) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.world == null) return null;
-
+    private static int parseRemoveAmount(ItemStack stack) {
         try {
-            List<Text> tooltip = stack.getTooltip(
-                    Item.TooltipContext.DEFAULT,
-                    client.player,
-                    TooltipType.BASIC
-            );
-
-            for (Text line : tooltip) {
-                String text = line.getString();
-
-                Matcher matcher = CRATE_PATTERN.matcher(text);
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-
-                if (text.contains("Crate") && !text.contains("Opens")) {
-                    String[] parts = text.split(" Crate");
-                    if (parts.length > 0) {
-                        String crateName = parts[0].trim();
-                        crateName = crateName.replaceAll("(?i)^(Opens?\\s+a?\\s*)", "");
-                        return crateName;
-                    }
-                }
+            String itemName = stack.getName().getString();
+            Matcher matcher = REMOVE_PATTERN.matcher(itemName);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
             }
         } catch (Exception e) {
-            System.err.println("[LoverMods] Error reading tooltip: " + e.getMessage());
         }
-
-        return null;
+        return 0;
     }
 
-    /**
-     * Reset detector state (call when screen closes)
-     */
     public static void reset() {
-        lastDetectedCrate = null;
+        lastCrateType = null;
     }
 }

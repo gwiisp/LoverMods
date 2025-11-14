@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 public class TradeOverlay {
     private static final Pattern MONEY_PATTERN = Pattern.compile("\\$([0-9,]+)");
     private static final int LINE_HEIGHT = 10;
+    private static boolean achievementTriggered = false;
 
     public static void render(DrawContext context, GenericContainerScreen screen) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -35,10 +36,14 @@ public class TradeOverlay {
         String title = screen.getTitle().getString();
 
         if (!title.toLowerCase().contains("trading")) {
+            achievementTriggered = false;
             return;
         }
 
-        AchievementManager.onTradeMenuOpened();
+        if (!achievementTriggered) {
+            AchievementManager.onTradeMenuOpened();
+            achievementTriggered = true;
+        }
 
         List<TradeItem> theirItems = new ArrayList<>();
         List<TradeItem> yourItems = new ArrayList<>();

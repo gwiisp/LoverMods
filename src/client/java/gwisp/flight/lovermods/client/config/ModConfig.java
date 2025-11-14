@@ -32,6 +32,10 @@ public class ModConfig {
     private boolean itemFrameShowSeason = false;
     private boolean itemFrameShowSet = false;
 
+    private boolean itemFrameRangeEnabled = false;
+    private int itemFrameRenderRadius = 30;
+    private boolean disableAnimatedTextures = false;
+
     private List<String> dungeonPartyMembers = new ArrayList<>();
 
     private boolean autoGgEnabled = false;
@@ -211,6 +215,30 @@ public class ModConfig {
 
     public void setMcmmoTrackerEnabled(boolean enabled) {
         this.mcmmoTrackerEnabled = enabled;
+    }
+
+    public boolean isItemFrameRangeEnabled() {
+        return itemFrameRangeEnabled;
+    }
+
+    public void setItemFrameRangeEnabled(boolean itemFrameRangeEnabled) {
+        this.itemFrameRangeEnabled = itemFrameRangeEnabled;
+    }
+
+    public int getItemFrameRenderRadius() {
+        return itemFrameRenderRadius;
+    }
+
+    public void setItemFrameRenderRadius(int itemFrameRenderRadius) {
+        this.itemFrameRenderRadius = Math.max(10, Math.min(500, itemFrameRenderRadius));
+    }
+
+    public boolean isDisableAnimatedTextures() {
+        return disableAnimatedTextures;
+    }
+
+    public void setDisableAnimatedTextures(boolean disableAnimatedTextures) {
+        this.disableAnimatedTextures = disableAnimatedTextures;
     }
 
     public void save() {
