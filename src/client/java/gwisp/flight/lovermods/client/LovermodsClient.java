@@ -1,5 +1,6 @@
 package gwisp.flight.lovermods.client;
 
+import gwisp.flight.lovermods.client.afk.AFKManager;
 import gwisp.flight.lovermods.client.commands.ClientRefreshSkinsCommand;
 import gwisp.flight.lovermods.client.commands.ConfigCommand;
 import gwisp.flight.lovermods.client.cosmetics.CosmeticManager;
@@ -16,6 +17,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -83,6 +85,8 @@ public class LovermodsClient implements ClientModInitializer {
                 checkForUpdates(client);
             }
 
+            AFKManager.tick();
+
             while (openConfigKey.wasPressed()) {
                 client.setScreen(new ConfigScreen(client.currentScreen, config));
             }
@@ -122,6 +126,11 @@ public class LovermodsClient implements ClientModInitializer {
             if (config.isNetherwartHighlightEnabled()) {
                 NetherwartHighlighterClient.renderHighlights(context);
             }
+        });
+
+        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            AFKManager.render(drawContext, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
         });
 
         WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {

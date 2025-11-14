@@ -27,6 +27,26 @@ public class AchievementManager {
 
     private static void registerAchievements() {
         register(new Achievement(
+                "mod_installed",
+                "Welcome!",
+                "Install LoverMods",
+                "✨",
+                Achievement.AchievementCategory.GENERAL,
+                5,
+                Achievement.AchievementRarity.COMMON
+        ));
+
+        register(new Achievement(
+                "news_reader",
+                "Stay Informed",
+                "Click on the news widget",
+                "📰",
+                Achievement.AchievementCategory.GENERAL,
+                10,
+                Achievement.AchievementRarity.COMMON
+        ));
+
+        register(new Achievement(
                 "mcmmo_first_skill",
                 "Baby Steps",
                 "Gain XP in any MCMMO skill",
@@ -63,7 +83,7 @@ public class AchievementManager {
                 "💯",
                 Achievement.AchievementCategory.MCMMO,
                 75,
-                Achievement.AchievementRarity.RARE
+                Achievement.AchievementRarity.UNCOMMON
         ));
 
         register(new Achievement(
@@ -72,27 +92,157 @@ public class AchievementManager {
                 "Reach level 1,000 in any MCMMO skill",
                 "🔥",
                 Achievement.AchievementCategory.MCMMO,
-                200,
-                Achievement.AchievementRarity.LEGENDARY
+                500,
+                Achievement.AchievementRarity.RARE
         ));
 
         register(new Achievement(
                 "mcmmo_level_5000",
-                "Legendary Grinder",
+                "Mythic Grinder",
                 "Reach level 5,000 in any MCMMO skill",
                 "🔥",
                 Achievement.AchievementCategory.MCMMO,
-                500,
+                1500,
                 Achievement.AchievementRarity.LEGENDARY
         ));
 
         register(new Achievement(
                 "mcmmo_level_10000",
-                "Legendary Grinder",
+                "Diamond Grinder",
                 "Reach level 10,000 in any MCMMO skill",
                 "🔥",
                 Achievement.AchievementCategory.MCMMO,
+                5000,
+                Achievement.AchievementRarity.MYTHIC
+        ));
+
+        register(new Achievement(
+                "mcmmo_level_100000",
+                "Uhhh Grinder..??",
+                "Reach level 100,000 in any MCMMO skill. This isnt actually possible dont even bother",
+                "🔥",
+                Achievement.AchievementCategory.MCMMO,
+                100000,
+                Achievement.AchievementRarity.IMPOSSIBLE
+        ));
+
+        register(new Achievement(
+                "first_crate",
+                "Lucky Box",
+                "Open your first crate",
+                "📦",
+                Achievement.AchievementCategory.CRATES,
+                10,
+                Achievement.AchievementRarity.COMMON
+        ));
+
+        register(new Achievement(
+                "open_10_crates",
+                "Crate Enthusiast",
+                "Open 10 crates",
+                "🎁",
+                Achievement.AchievementCategory.CRATES,
+                25,
+                Achievement.AchievementRarity.UNCOMMON
+        ).withProgress(10));
+
+        register(new Achievement(
+                "open_50_crates",
+                "Crate Hunter",
+                "Open 50 crates",
+                "🎰",
+                Achievement.AchievementCategory.CRATES,
+                75,
+                Achievement.AchievementRarity.RARE
+        ).withProgress(50));
+
+        register(new Achievement(
+                "open_100_crates",
+                "Crate Master",
+                "Open 100 crates",
+                "👑",
+                Achievement.AchievementCategory.CRATES,
+                150,
+                Achievement.AchievementRarity.LEGENDARY
+        ).withProgress(100));
+
+        register(new Achievement(
+                "open_500_crates",
+                "Crate Legend",
+                "Open 500 crates",
+                "💎",
+                Achievement.AchievementCategory.CRATES,
+                250,
+                Achievement.AchievementRarity.MYTHIC
+        ).withProgress(500));
+
+        register(new Achievement(
+                "daily_crate",
+                "Daily Grinder",
+                "Open a Daily Crate",
+                "📅",
+                Achievement.AchievementCategory.CRATES,
+                15,
+                Achievement.AchievementRarity.COMMON
+        ));
+
+        register(new Achievement(
+                "vote_crate",
+                "Democracy",
+                "Open a Vote Crate",
+                "🗳️",
+                Achievement.AchievementCategory.CRATES,
+                15,
+                Achievement.AchievementRarity.COMMON
+        ));
+
+        register(new Achievement(
+                "flipper_crate",
+                "Flipper Master",
+                "Open a Flipper Crate",
+                "🐬",
+                Achievement.AchievementCategory.CRATES,
+                25,
+                Achievement.AchievementRarity.UNCOMMON
+        ));
+
+        register(new Achievement(
+                "invader_crate",
+                "Space Invader",
+                "Open an Invader Crate",
+                "👾",
+                Achievement.AchievementCategory.CRATES,
+                50,
+                Achievement.AchievementRarity.RARE
+        ));
+
+        register(new Achievement(
+                "risk_it_crate",
+                "High Roller",
+                "Open a Risk It Crate",
+                "🎲",
+                Achievement.AchievementCategory.CRATES,
+                75,
+                Achievement.AchievementRarity.EPIC
+        ));
+
+        register(new Achievement(
+                "loverflex_crate",
+                "Flexing Hard",
+                "Open a Loverflex Crate",
+                "💪",
+                Achievement.AchievementCategory.CRATES,
                 1000,
+                Achievement.AchievementRarity.LEGENDARY
+        ));
+
+        register(new Achievement(
+                "lover_noble_crate",
+                "Noble Unboxing",
+                "Open a Lover Noble Crate",
+                "🎩",
+                Achievement.AchievementCategory.CRATES,
+                5000,
                 Achievement.AchievementRarity.MYTHIC
         ));
 
@@ -127,33 +277,13 @@ public class AchievementManager {
         ).withProgress(100));
 
         register(new Achievement(
-                "mod_installed",
-                "Welcome!",
-                "Install LoverMods",
-                "✨",
-                Achievement.AchievementCategory.GENERAL,
-                5,
-                Achievement.AchievementRarity.COMMON
-        ));
-
-        register(new Achievement(
-                "news_reader",
-                "Stay Informed",
-                "Click on the news widget",
-                "📰",
-                Achievement.AchievementCategory.GENERAL,
-                10,
-                Achievement.AchievementRarity.COMMON
-        ));
-
-        register(new Achievement(
                 "holy_collexl",
                 "True Believer",
                 "Say the holy phrase in chat",
                 "🙏",
                 Achievement.AchievementCategory.SOCIAL,
-                10000,
-                Achievement.AchievementRarity.MYTHIC
+                1000,
+                Achievement.AchievementRarity.SPECIAL
         ));
 
         register(new Achievement(
@@ -162,8 +292,28 @@ public class AchievementManager {
                 "Reach the end of life.",
                 "📰",
                 Achievement.AchievementCategory.GENERAL,
-                100000,
-                Achievement.AchievementRarity.LEGENDARY
+                500,
+                Achievement.AchievementRarity.SPECIAL
+        ));
+
+        register(new Achievement(
+                "lunargato_nuub",
+                "Certified Nuub",
+                "Someones a nuub xD",
+                "🤡",
+                Achievement.AchievementCategory.SOCIAL,
+                50,
+                Achievement.AchievementRarity.SPECIAL
+        ));
+
+        register(new Achievement(
+                "cisland",
+                "Hello Collexl Island!",
+                "Live in your new paradise!",
+                "☀",
+                Achievement.AchievementCategory.GENERAL,
+                250,
+                Achievement.AchievementRarity.SPECIAL
         ));
     }
 
@@ -248,6 +398,9 @@ public class AchievementManager {
         if (level >= 10000) {
             unlock("mcmmo_level_10000");
         }
+        if (level >= 100000) {
+            unlock("mcmmo_level_100000");
+        }
     }
 
     public static void onTradeMenuOpened() {
@@ -264,6 +417,47 @@ public class AchievementManager {
         String normalized = message.toLowerCase().trim();
         if (normalized.equals("i am one with him. the one and only holy collexl.")) {
             unlock("holy_collexl");
+        }
+    }
+
+    public static void onChatReceived(String message) {
+        if (message == null) return;
+
+        String normalized = message
+                .replace("’", "'")
+                .replaceAll("§.", "")
+                .toLowerCase()
+                .trim();
+
+        if (normalized.contains("entering collexl") || normalized.contains("collexl's claimed land")) {
+            unlock("cisland");
+            System.out.println("[LoverMods] Entered Collexl's claimed land — unlocked cisland");
+        }
+    }
+
+    public static void onCrateOpened(String crateType) {
+        unlock("first_crate");
+        incrementProgress("open_10_crates", 1);
+        incrementProgress("open_50_crates", 1);
+        incrementProgress("open_100_crates", 1);
+        incrementProgress("open_500_crates", 1);
+
+        String normalized = crateType.toLowerCase().trim();
+
+        if (normalized.contains("daily")) {
+            unlock("daily_crate");
+        } else if (normalized.contains("vote")) {
+            unlock("vote_crate");
+        } else if (normalized.contains("flipper")) {
+            unlock("flipper_crate");
+        } else if (normalized.contains("invader")) {
+            unlock("invader_crate");
+        } else if (normalized.contains("risk")) {
+            unlock("risk_it_crate");
+        } else if (normalized.contains("loverflex")) {
+            unlock("loverflex_crate");
+        } else if (normalized.contains("noble")) {
+            unlock("lover_noble_crate");
         }
     }
 
@@ -314,6 +508,56 @@ public class AchievementManager {
             }
         } catch (IOException e) {
             System.err.println("[LoverMods] Failed to save achievements: " + e.getMessage());
+        }
+    }
+
+    /**
+     * FOR TESTING ONLY - Unlocks all achievements
+     */
+    public static void unlockAll() {
+        for (Achievement achievement : achievements.values()) {
+            if (!achievement.isUnlocked()) {
+                achievement.unlock();
+            }
+        }
+        saveProgress();
+        System.out.println("[LoverMods] All achievements unlocked (TEST MODE)");
+    }
+
+    public static void resetAll() {
+        for (Achievement achievement : achievements.values()) {
+            achievement.setProgress(0);
+            if (achievement.isUnlocked()) {
+                achievement.setProgress(0);
+            }
+        }
+        mcmmoSkillsSeen.clear();
+
+        try {
+            if (Files.exists(SAVE_FILE)) {
+                Files.delete(SAVE_FILE);
+            }
+        } catch (IOException e) {
+            System.err.println("[LoverMods] Failed to delete save file: " + e.getMessage());
+        }
+
+        achievements.clear();
+        registerAchievements();
+
+        unlock("mod_installed");
+
+        System.out.println("[LoverMods] All achievements reset (TEST MODE)");
+    }
+
+    public static void onCommandSent(String command) {
+        String normalized = command.toLowerCase().trim();
+
+        if (normalized.startsWith("/msg lunargato") || normalized.startsWith("/w lunargato") ||
+                normalized.startsWith("/tell lunargato") || normalized.startsWith("/whisper lunargato")) {
+
+            if (normalized.contains("nuub")) {
+                unlock("lunargato_nuub");
+            }
         }
     }
 

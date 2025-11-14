@@ -13,6 +13,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import net.minecraft.client.util.Window;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -90,7 +91,7 @@ public abstract class TitleScreenMixin extends Screen {
         this.addDrawableChild(achievementsButton);
     }
 
-    @Inject(method = "method_25394", at = @At("RETURN"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void renderLoverModsInfo(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         String version = FabricLoader.getInstance()
                 .getModContainer("lovermods")
@@ -110,9 +111,7 @@ public abstract class TitleScreenMixin extends Screen {
 
         textWidget.render(context, mouseX, mouseY, delta);
 
-        if (NewsManager.isLoaded() && NewsManager.getArticleCount() > 0) {
-            newsWidget.render(context, this.width, this.height, mouseX, mouseY);
-        }
+        newsWidget.render(context, this.width, this.height, mouseX, mouseY);
     }
 
     @Inject(method = "method_25402", at = @At("HEAD"), cancellable = true)

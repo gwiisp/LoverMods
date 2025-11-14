@@ -5,7 +5,10 @@ import gwisp.flight.lovermods.client.achievements.AchievementManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
+import net.minecraft.text.Style;
+import net.minecraft.text.TextColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,10 @@ public class AchievementsScreen extends Screen {
     private Achievement.AchievementCategory selectedCategory = null;
     private List<Achievement> displayedAchievements;
 
+    private boolean draggingScrollbar = false;
+    private double dragStartY;
+    private int dragStartOffset;
+
     public AchievementsScreen(Screen parent) {
         super(Text.literal("Achievements"));
         this.parent = parent;
@@ -28,6 +35,15 @@ public class AchievementsScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+
+        TextWidget titleWidget = new TextWidget(
+                0, 10,
+                this.width, 20,
+                Text.literal("§6§lAchievements"),
+                this.textRenderer
+        );
+        titleWidget.alignCenter();
+        this.addDrawableChild(titleWidget);
 
         int buttonY = this.height - 30;
         int buttonWidth = 60;
@@ -54,6 +70,25 @@ public class AchievementsScreen extends Screen {
             ).dimensions(startX + (spacing * (category.ordinal() + 1)), buttonY, buttonWidth, 20).build());
         }
 
+        int testButtonY = 10;
+        int testButtonX = this.width - 180;
+
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("§cReset All"),
+                button -> {
+                    AchievementManager.resetAll();
+                    updateDisplayedAchievements();
+                }
+        ).dimensions(testButtonX, testButtonY, 80, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("§aUnlock All"),
+                button -> {
+                    AchievementManager.unlockAll();
+                    updateDisplayedAchievements();
+                }
+        ).dimensions(testButtonX + 90, testButtonY, 80, 20).build());
+
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Back"),
                 button -> this.close()
@@ -72,19 +107,19 @@ public class AchievementsScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        String title = "§6§lAchievements";
-        int titleWidth = this.textRenderer.getWidth(title);
-        context.drawTextWithShadow(this.textRenderer, title,
-                this.width / 2 - titleWidth / 2, 10, 0xFFFFFF);
-
         int unlocked = AchievementManager.getUnlockedCount();
         int total = AchievementManager.getTotalCount();
         int points = AchievementManager.getTotalPoints();
 
         String stats = String.format("§7Progress: §a%d§7/§a%d §7(§e%d pts§7)", unlocked, total, points);
-        int statsWidth = this.textRenderer.getWidth(stats);
-        context.drawTextWithShadow(this.textRenderer, stats,
-                this.width / 2 - statsWidth / 2, 25, 0xFFFFFF);
+        TextWidget statsWidget = new TextWidget(
+                0, 25,
+                this.width, 20,
+                Text.literal(stats),
+                this.textRenderer
+        );
+        statsWidget.alignCenter();
+        statsWidget.render(context, mouseX, mouseY, delta);
 
         int startY = 45;
         int maxY = this.height - 60;
@@ -101,21 +136,18 @@ public class AchievementsScreen extends Screen {
                 break;
             }
 
-            renderAchievement(context, achievement, 10, currentY, this.width - 20, mouseX, mouseY);
+            renderAchievement(context, achievement, 10, currentY, this.width - 30, mouseX, mouseY, delta);
             currentY += ITEM_HEIGHT + 5;
             index++;
         }
 
         if (displayedAchievements.size() > VISIBLE_ITEMS) {
-            String hint = "§7Scroll to see more...";
-            int hintWidth = this.textRenderer.getWidth(hint);
-            context.drawTextWithShadow(this.textRenderer, hint,
-                    this.width / 2 - hintWidth / 2, maxY + 5, 0xFFFFFF);
+            renderScrollbar(context, mouseX, mouseY);
         }
     }
 
     private void renderAchievement(DrawContext context, Achievement achievement,
-                                   int x, int y, int width, int mouseX, int mouseY) {
+                                   int x, int y, int width, int mouseX, int mouseY, float delta) {
         int bgColor = achievement.isUnlocked() ? 0xE0003300 : 0xE0000000;
         context.fill(x, y, x + width, y + ITEM_HEIGHT, bgColor);
 
@@ -123,22 +155,44 @@ public class AchievementsScreen extends Screen {
                 achievement.getRarity().getColor() : 0xFF333333;
         context.drawBorder(x, y, width, ITEM_HEIGHT, borderColor);
 
-        String icon = achievement.getIcon();
-        context.drawTextWithShadow(this.textRenderer, icon, x + 5, y + 5, 0xFFFFFF);
+        TextWidget iconWidget = new TextWidget(
+                x + 5, y + 5,
+                20, 10,
+                Text.literal(achievement.getIcon()),
+                this.textRenderer
+        );
+        iconWidget.render(context, mouseX, mouseY, delta);
 
         String title = achievement.getTitle();
         if (title.length() > 35) {
             title = title.substring(0, 32) + "...";
         }
-        int titleColor = achievement.isUnlocked() ?
-                achievement.getRarity().getColor() : 0xAAAAAA;
-        context.drawTextWithShadow(this.textRenderer, "§l" + title, x + 25, y + 5, titleColor);
+
+        int rarityColor = achievement.isUnlocked() ? achievement.getRarity().getColor() : 0xAAAAAA;
+        Text titleText = Text.literal(title)
+                .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(rarityColor)).withBold(true));
+
+        TextWidget titleWidget = new TextWidget(
+                x + 25, y + 5,
+                width - 100, 10,
+                titleText,
+                this.textRenderer
+        );
+        titleWidget.alignLeft();
+        titleWidget.render(context, mouseX, mouseY, delta);
 
         String desc = achievement.getDescription();
-        if (desc.length() > 50) {
+        if (desc.length() > 150) {
             desc = desc.substring(0, 47) + "...";
         }
-        context.drawTextWithShadow(this.textRenderer, "§7" + desc, x + 25, y + 18, 0xFFFFFF);
+        TextWidget descWidget = new TextWidget(
+                x + 25, y + 18,
+                width - 30, 10,
+                Text.literal("§7" + desc),
+                this.textRenderer
+        );
+        descWidget.alignLeft();
+        descWidget.render(context, mouseX, mouseY, delta);
 
         if (!achievement.isUnlocked() && achievement.getMaxProgress() > 1) {
             int barX = x + 25;
@@ -153,33 +207,108 @@ public class AchievementsScreen extends Screen {
 
             String progressText = String.format("%.0f/%.0f",
                     achievement.getProgress(), achievement.getMaxProgress());
-            context.drawTextWithShadow(this.textRenderer, "§7" + progressText,
-                    barX, barY + 6, 0xFFFFFF);
+            TextWidget progressWidget = new TextWidget(
+                    barX, barY + 6,
+                    100, 10,
+                    Text.literal("§7" + progressText),
+                    this.textRenderer
+            );
+            progressWidget.alignLeft();
+            progressWidget.render(context, mouseX, mouseY, delta);
         }
 
         String info = "§e" + achievement.getPoints() + " pts §7• " +
                 achievement.getRarity().getName();
-        context.drawTextWithShadow(this.textRenderer, info, x + 25, y + 45, 0xFFFFFF);
+        TextWidget infoWidget = new TextWidget(
+                x + 25, y + 45,
+                200, 10,
+                Text.literal(info),
+                this.textRenderer
+        );
+        infoWidget.alignLeft();
+        infoWidget.render(context, mouseX, mouseY, delta);
 
         if (!achievement.isUnlocked()) {
-            context.drawTextWithShadow(this.textRenderer, "§8🔒 Locked",
-                    x + width - 60, y + 5, 0xFFFFFF);
+            TextWidget lockWidget = new TextWidget(
+                    x + width - 60, y + 5,
+                    60, 10,
+                    Text.literal("§8🔒 Locked"),
+                    this.textRenderer
+            );
+            lockWidget.alignLeft();
+            lockWidget.render(context, mouseX, mouseY, delta);
         } else {
-            context.drawTextWithShadow(this.textRenderer, "§a✓ Unlocked",
-                    x + width - 70, y + 5, 0xFFFFFF);
+            TextWidget unlockWidget = new TextWidget(
+                    x + width - 70, y + 5,
+                    70, 10,
+                    Text.literal("§a✓ Unlocked"),
+                    this.textRenderer
+            );
+            unlockWidget.alignLeft();
+            unlockWidget.render(context, mouseX, mouseY, delta);
         }
+    }
+
+    private void renderScrollbar(DrawContext context, int mouseX, int mouseY) {
+        int listHeight = (VISIBLE_ITEMS * (ITEM_HEIGHT + 5));
+        int scrollbarX = this.width - 15;
+        int scrollbarY = 45;
+        int scrollbarHeight = listHeight;
+        int handleHeight = Math.max(20, (int) (scrollbarHeight * (VISIBLE_ITEMS / (float) displayedAchievements.size())));
+        int maxScroll = Math.max(1, displayedAchievements.size() - VISIBLE_ITEMS);
+        int handleY = scrollbarY + (int) ((scrollOffset / (float) maxScroll) * (scrollbarHeight - handleHeight));
+
+        context.fill(scrollbarX, scrollbarY, scrollbarX + 6, scrollbarY + scrollbarHeight, 0x66000000);
+        context.fill(scrollbarX, handleY, scrollbarX + 6, handleY + handleHeight, 0xFFAAAAAA);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int scrollbarX = this.width - 15;
+        int scrollbarY = 45;
+        int scrollbarHeight = (VISIBLE_ITEMS * (ITEM_HEIGHT + 5));
+        int handleHeight = Math.max(20, (int) (scrollbarHeight * (VISIBLE_ITEMS / (float) displayedAchievements.size())));
+        int maxScroll = Math.max(1, displayedAchievements.size() - VISIBLE_ITEMS);
+        int handleY = scrollbarY + (int) ((scrollOffset / (float) maxScroll) * (scrollbarHeight - handleHeight));
+
+        if (mouseX >= scrollbarX && mouseX <= scrollbarX + 6 && mouseY >= handleY && mouseY <= handleY + handleHeight) {
+            draggingScrollbar = true;
+            dragStartY = mouseY;
+            dragStartOffset = scrollOffset;
+            return true;
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        draggingScrollbar = false;
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (draggingScrollbar) {
+            int scrollbarHeight = (VISIBLE_ITEMS * (ITEM_HEIGHT + 5));
+            int handleHeight = Math.max(20, (int) (scrollbarHeight * (VISIBLE_ITEMS / (float) displayedAchievements.size())));
+            int maxScroll = Math.max(1, displayedAchievements.size() - VISIBLE_ITEMS);
+
+            double delta = (mouseY - dragStartY) / (scrollbarHeight - handleHeight);
+            scrollOffset = Math.min(maxScroll, Math.max(0, dragStartOffset + (int)(delta * maxScroll)));
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         int maxScroll = Math.max(0, displayedAchievements.size() - VISIBLE_ITEMS);
-
         if (verticalAmount > 0) {
             scrollOffset = Math.max(0, scrollOffset - 1);
         } else if (verticalAmount < 0) {
             scrollOffset = Math.min(maxScroll, scrollOffset + 1);
         }
-
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 

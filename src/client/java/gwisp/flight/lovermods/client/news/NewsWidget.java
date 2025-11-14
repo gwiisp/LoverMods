@@ -28,7 +28,7 @@ public class NewsWidget {
     private long lastClickTime = 0;
     private long lastAutoSwitchTime = 0;
     private long lastNewsRefreshTime = 0;
-    private static final long CLICK_COOLDOWN = 200; // ms
+    private static final long CLICK_COOLDOWN = 200;
     private static final long AUTO_SWITCH_INTERVAL = 5000;
     private static final long NEWS_REFRESH_INTERVAL = 120000;
     private boolean bottomLeft = false;
@@ -38,6 +38,11 @@ public class NewsWidget {
     }
 
     public void render(DrawContext context, int screenWidth, int screenHeight, int mouseX, int mouseY) {
+        // Disable on incompatible versions (1.21.6+)
+        if (!VersionHelper.isNewsWidgetCompatible()) {
+            return;
+        }
+
         List<NewsManager.NewsArticle> articles = NewsManager.getArticles();
         if (articles.isEmpty()) return;
 
@@ -54,7 +59,9 @@ public class NewsWidget {
         if (currentTime - lastNewsRefreshTime >= NEWS_REFRESH_INTERVAL) {
             lastNewsRefreshTime = currentTime;
             NewsManager.loadNews().thenRun(() -> {
+                /*
                 System.out.println("[LoverMods] News auto-refreshed successfully");
+                 */
                 List<NewsManager.NewsArticle> newArticles = NewsManager.getArticles();
                 if (currentIndex >= newArticles.size()) {
                     currentIndex = 0;
@@ -151,6 +158,11 @@ public class NewsWidget {
     }
 
     public boolean mouseClicked(int screenWidth, int screenHeight, double mouseX, double mouseY, int button) {
+        // Disable on incompatible versions (1.21.6+)
+        if (!VersionHelper.isNewsWidgetCompatible()) {
+            return false;
+        }
+
         List<NewsManager.NewsArticle> articles = NewsManager.getArticles();
         if (articles.isEmpty()) return false;
 
@@ -222,11 +234,15 @@ public class NewsWidget {
                         MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
                         imageCache.put(urlString, id);
                     } catch (Exception e) {
+                       /*
                         System.out.println("[LoverMods] Failed to create texture: " + e.getMessage());
+                        */
                     }
                 });
             } catch (Exception e) {
+                /*
                 System.out.println("[LoverMods] Failed to load news image: " + e.getMessage());
+                 */
             }
         }).start();
 

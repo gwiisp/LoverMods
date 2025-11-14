@@ -101,7 +101,9 @@ public class ItemFrameSkinValueRenderer {
             Matrix4f matrix = matrices.peek().getPositionMatrix();
             float xOffset = -textRenderer.getWidth(text) / 2f;
 
+            /*
             System.out.println("Rendering: " + text + " at offset " + xOffset);
+             */
 
             java.lang.reflect.Method drawMethod = TextRenderer.class.getDeclaredMethod(
                     "method_27522",
@@ -135,14 +137,20 @@ public class ItemFrameSkinValueRenderer {
                             0,
                             0xF000F0
                     );
+                    /*
                     System.out.println("Drew with " + layerType);
+                     */
                 } catch (Exception e) {
+                    /*
                     System.err.println("Failed with " + layerType + ": " + e.getMessage());
+                     */
                 }
             }
 
         } catch (Exception e) {
+            /*
             System.err.println("Error rendering item frame text: " + e.getMessage());
+             */
             e.printStackTrace();
         }
 

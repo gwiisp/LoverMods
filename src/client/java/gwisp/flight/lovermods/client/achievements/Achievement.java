@@ -66,7 +66,7 @@ public class Achievement {
         GENERAL("General", 0xFFFFFF),
         MCMMO("MCMMO", 0x55FF55),
         TRADING("Trading", 0xFFAA00),
-        EXPLORATION("Exploration", 0x55FFFF),
+        CRATES("Crates", 0x55FFFF),
         COMBAT("Combat", 0xFF5555),
         SOCIAL("Social", 0xFF55FF);
 
@@ -88,7 +88,9 @@ public class Achievement {
         RARE("Rare", 0x5555FF, 50),
         EPIC("Epic", 0xAA00AA, 100),
         LEGENDARY("Legendary", 0xFFAA00, 250),
-        MYTHIC("Mythic", 0xFFAA00, 500);
+        MYTHIC("Mythic", 0xAA00FF, 500),
+        IMPOSSIBLE("Impossible", 0x000000, 5000),
+        SPECIAL("Special", 0xFF0000, 5000);
 
         private final String name;
         private final int color;

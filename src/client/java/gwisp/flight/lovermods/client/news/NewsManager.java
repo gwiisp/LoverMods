@@ -48,6 +48,10 @@ public class NewsManager {
     }
 
     public static CompletableFuture<Void> loadNews() {
+            if (!VersionHelper.isNewsWidgetCompatible()) {
+                return CompletableFuture.completedFuture(null);
+            }
+
         return CompletableFuture.runAsync(() -> {
             System.out.println("[LoverMods] Loading news from: " + NEWS_URL);
             try {

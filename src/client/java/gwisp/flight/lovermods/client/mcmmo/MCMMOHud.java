@@ -4,11 +4,15 @@ import gwisp.flight.lovermods.client.LovermodsClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.text.Text;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 import java.util.List;
 
 public class MCMMOHud {
-    private static final int PADDING = 5;
+    private static final int PADDING = 8;
     private static final int LINE_HEIGHT = 10;
     private static final int HUD_SPACING = 5;
     private static final int BG_COLOR = 0xE0000000;
@@ -27,7 +31,6 @@ public class MCMMOHud {
 
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
-
         List<MCMMOTracker.SkillData> activeSkills = tracker.getActiveSkills();
 
         if (activeSkills == null || activeSkills.isEmpty()) {
@@ -40,10 +43,14 @@ public class MCMMOHud {
         for (int i = activeSkills.size() - 1; i >= 0; i--) {
             MCMMOTracker.SkillData skill = activeSkills.get(i);
 
-            String skillName = "§6§l" + skill.skillName;
-            String levelText = "§7Level: §f" + String.format("%,d", skill.currentLevel);
-            String xpText = "§7XP: §a" + String.format("%.1f%%", skill.currentXPPercent * 100);
-            String etaText = "§7ETA: §b" + skill.getEstimatedTimeToLevel();
+            Text skillName = Text.literal(skill.skillName)
+                    .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true));
+            Text levelText = Text.literal("Level: " + String.format("%,d", skill.currentLevel))
+                    .setStyle(Style.EMPTY.withColor(Formatting.WHITE));
+            Text xpText = Text.literal("XP: " + String.format("%.1f%%", skill.currentXPPercent * 100))
+                    .setStyle(Style.EMPTY.withColor(Formatting.GREEN));
+            Text etaText = Text.literal("ETA: " + skill.getEstimatedTimeToLevel())
+                    .setStyle(Style.EMPTY.withColor(Formatting.AQUA));
 
             int maxWidth = Math.max(Math.max(
                     textRenderer.getWidth(skillName),
@@ -54,7 +61,7 @@ public class MCMMOHud {
             ));
 
             int hudWidth = maxWidth + (PADDING * 2);
-            int hudHeight = (LINE_HEIGHT * 4) + (PADDING * 2);
+            int hudHeight = (LINE_HEIGHT * 4) + (PADDING * 2) + 3; // extra spacing between lines
 
             int x = screenWidth - hudWidth - 10;
             int y = currentY - hudHeight;
@@ -65,22 +72,28 @@ public class MCMMOHud {
             int textX = x + PADDING;
             int textY = y + PADDING;
 
-            context.drawTextWithShadow(textRenderer, skillName, textX, textY, 0xFFFFFF);
-            textY += LINE_HEIGHT;
+            int skillNameWidth = textRenderer.getWidth(skillName);
+            new TextWidget(textX, textY, skillNameWidth, LINE_HEIGHT, skillName, textRenderer)
+                    .render(context, 0, 0, 0);
+            textY += LINE_HEIGHT + 1;
 
-            context.drawTextWithShadow(textRenderer, levelText, textX, textY, 0xFFFFFF);
-            textY += LINE_HEIGHT;
+            int levelTextWidth = textRenderer.getWidth(levelText);
+            new TextWidget(textX, textY, levelTextWidth, LINE_HEIGHT, levelText, textRenderer)
+                    .render(context, 0, 0, 0);
+            textY += LINE_HEIGHT + 1;
 
-            context.drawTextWithShadow(textRenderer, xpText, textX, textY, 0xFFFFFF);
-            textY += LINE_HEIGHT;
+            int xpTextWidth = textRenderer.getWidth(xpText);
+            new TextWidget(textX, textY, xpTextWidth, LINE_HEIGHT, xpText, textRenderer)
+                    .render(context, 0, 0, 0);
+            textY += LINE_HEIGHT + 1;
 
-            context.drawTextWithShadow(textRenderer, etaText, textX, textY, 0xFFFFFF);
+            int etaTextWidth = textRenderer.getWidth(etaText);
+            new TextWidget(textX, textY, etaTextWidth, LINE_HEIGHT, etaText, textRenderer)
+                    .render(context, 0, 0, 0);
 
             int barY = y + hudHeight + 2;
             int barHeight = 3;
-
             context.fill(x, barY, x + hudWidth, barY + barHeight, 0xFF333333);
-
             int progressWidth = (int) (hudWidth * skill.currentXPPercent);
             int color = getProgressColor(skill.currentXPPercent);
             context.fill(x, barY, x + progressWidth, barY + barHeight, color);
@@ -89,14 +102,15 @@ public class MCMMOHud {
         }
     }
 
-    /**
-     * Render a single skill HUD if tracker.getActiveSkills() is empty.
-     */
     private void renderSingleSkill(DrawContext context, TextRenderer textRenderer, int screenWidth, int screenHeight) {
-        String skillName = "§6§l" + tracker.getCurrentSkill();
-        String levelText = "§7Level: §f" + String.format("%,d", tracker.getCurrentLevel());
-        String xpText = "§7XP: §a" + String.format("%.1f%%", tracker.getCurrentXPPercent() * 100);
-        String etaText = "§7ETA: §b" + tracker.getEstimatedTimeToLevel();
+        Text skillName = Text.literal(tracker.getCurrentSkill())
+                .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true));
+        Text levelText = Text.literal("Level: " + String.format("%,d", tracker.getCurrentLevel()))
+                .setStyle(Style.EMPTY.withColor(Formatting.WHITE));
+        Text xpText = Text.literal("XP: " + String.format("%.1f%%", tracker.getCurrentXPPercent() * 100))
+                .setStyle(Style.EMPTY.withColor(Formatting.GREEN));
+        Text etaText = Text.literal("ETA: " + tracker.getEstimatedTimeToLevel())
+                .setStyle(Style.EMPTY.withColor(Formatting.AQUA));
 
         int maxWidth = Math.max(Math.max(
                 textRenderer.getWidth(skillName),
@@ -107,8 +121,7 @@ public class MCMMOHud {
         ));
 
         int hudWidth = maxWidth + (PADDING * 2);
-        int hudHeight = (LINE_HEIGHT * 4) + (PADDING * 2);
-
+        int hudHeight = (LINE_HEIGHT * 4) + (PADDING * 2) + 3; // extra spacing between lines
         int x = screenWidth - hudWidth - 10;
         int y = screenHeight - hudHeight - 10;
 
@@ -118,31 +131,36 @@ public class MCMMOHud {
         int textX = x + PADDING;
         int textY = y + PADDING;
 
-        context.drawTextWithShadow(textRenderer, skillName, textX, textY, 0xFFFFFF);
-        textY += LINE_HEIGHT;
-        context.drawTextWithShadow(textRenderer, levelText, textX, textY, 0xFFFFFF);
-        textY += LINE_HEIGHT;
-        context.drawTextWithShadow(textRenderer, xpText, textX, textY, 0xFFFFFF);
-        textY += LINE_HEIGHT;
-        context.drawTextWithShadow(textRenderer, etaText, textX, textY, 0xFFFFFF);
+        int skillNameWidth = textRenderer.getWidth(skillName);
+        new TextWidget(textX, textY, skillNameWidth, LINE_HEIGHT, skillName, textRenderer)
+                .render(context, 0, 0, 0);
+        textY += LINE_HEIGHT + 1;
+
+        int levelTextWidth = textRenderer.getWidth(levelText);
+        new TextWidget(textX, textY, levelTextWidth, LINE_HEIGHT, levelText, textRenderer)
+                .render(context, 0, 0, 0);
+        textY += LINE_HEIGHT + 1;
+
+        int xpTextWidth = textRenderer.getWidth(xpText);
+        new TextWidget(textX, textY, xpTextWidth, LINE_HEIGHT, xpText, textRenderer)
+                .render(context, 0, 0, 0);
+        textY += LINE_HEIGHT + 1;
+
+        int etaTextWidth = textRenderer.getWidth(etaText);
+        new TextWidget(textX, textY, etaTextWidth, LINE_HEIGHT, etaText, textRenderer)
+                .render(context, 0, 0, 0);
 
         int barY = y + hudHeight + 2;
         int barHeight = 3;
-
         context.fill(x, barY, x + hudWidth, barY + barHeight, 0xFF333333);
-
         int progressWidth = (int) (hudWidth * tracker.getCurrentXPPercent());
         int color = getProgressColor(tracker.getCurrentXPPercent());
         context.fill(x, barY, x + progressWidth, barY + barHeight, color);
     }
 
     private int getProgressColor(float percent) {
-        if (percent < 0.33f) {
-            return 0xFFFF5555;
-        } else if (percent < 0.66f) {
-            return 0xFFFFAA00;
-        } else {
-            return 0xFF55FF55;
-        }
+        if (percent < 0.33f) return 0xFFFF5555;
+        if (percent < 0.66f) return 0xFFFFAA00;
+        return 0xFF55FF55;
     }
 }

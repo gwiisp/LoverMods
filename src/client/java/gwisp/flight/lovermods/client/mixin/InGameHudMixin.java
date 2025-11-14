@@ -32,6 +32,7 @@ public class InGameHudMixin {
     @Unique
     private static boolean lovermods$listenerRegistered = false;
 
+    // Updated method for 1.21.6 - removed RenderTickCounter parameter why is mojang so annoying i know noone will see this but god damn am i pissed
     @Inject(method = "render", at = @At("RETURN"))
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (!lovermods$listenerRegistered) {

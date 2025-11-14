@@ -116,9 +116,6 @@ public class MCMMOTracker {
         return new ArrayList<>(activeSkills.values());
     }
 
-    // ===========================
-    // Inner Class: SkillData
-    // ===========================
     public static class SkillData {
         public final String skillName;
         public int currentLevel;

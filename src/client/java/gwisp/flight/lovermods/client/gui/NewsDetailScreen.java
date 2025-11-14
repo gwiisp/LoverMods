@@ -19,12 +19,15 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URL;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NewsDetailScreen extends Screen {
     private final Screen parent;
     private final NewsManager.NewsArticle article;
     private Identifier imageTexture;
     private boolean imageLoaded = false;
+    private List<TextWidget> descriptionWidgets = new ArrayList<>();
 
     public NewsDetailScreen(Screen parent, NewsManager.NewsArticle article) {
         super(Text.literal("News"));
@@ -37,29 +40,98 @@ public class NewsDetailScreen extends Screen {
     protected void init() {
         super.init();
 
+        descriptionWidgets.clear();
+
+        int centerX = this.width / 2;
+        int startY = 40;
+
+        TextWidget titleWidget = new TextWidget(
+                0,
+                startY,
+                this.width,
+                20,
+                Text.literal("§6§l" + article.getTitle()),
+                this.textRenderer
+        );
+        titleWidget.alignCenter();
+        this.addDrawableChild(titleWidget);
+
+        int imageHeight = 250;
+        int descY = startY + 30 + imageHeight + 20;
+
+        String description = article.getDescription();
+        int maxWidth = 500;
+        String[] words = description.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+        int currentY = descY;
+        int lineHeight = 12;
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            int testWidth = this.textRenderer.getWidth(testLine);
+
+            if (testWidth > maxWidth && currentLine.length() > 0) {
+                TextWidget lineWidget = new TextWidget(
+                        0,
+                        currentY,
+                        this.width,
+                        lineHeight,
+                        Text.literal(currentLine.toString()),
+                        this.textRenderer
+                );
+                lineWidget.alignCenter();
+                this.addDrawableChild(lineWidget);
+                descriptionWidgets.add(lineWidget);
+
+                currentY += lineHeight;
+                currentLine = new StringBuilder(word);
+            } else {
+                currentLine = new StringBuilder(testLine);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            TextWidget lineWidget = new TextWidget(
+                    0,
+                    currentY,
+                    this.width,
+                    lineHeight,
+                    Text.literal(currentLine.toString()),
+                    this.textRenderer
+            );
+            lineWidget.alignCenter();
+            this.addDrawableChild(lineWidget);
+            descriptionWidgets.add(lineWidget);
+        }
+
         int buttonWidth = 200;
-        int centerX = this.width / 2 - buttonWidth / 2;
+        int buttonCenterX = this.width / 2 - buttonWidth / 2;
         int buttonY = this.height - 60;
+
         if (article.getLink() != null && !article.getLink().isEmpty()) {
             String domain = extractDomain(article.getLink());
 
             TextWidget linkInfoWidget = new TextWidget(
+                    0,
+                    buttonY - 15,
+                    this.width,
+                    12,
                     Text.literal("§7Link: §b" + domain),
                     this.textRenderer
             );
-            linkInfoWidget.setPosition(centerX, buttonY - 15);
+            linkInfoWidget.alignCenter();
             this.addDrawableChild(linkInfoWidget);
 
             this.addDrawableChild(ButtonWidget.builder(
                     Text.literal("§aRead More"),
                     button -> Util.getOperatingSystem().open(URI.create(article.getLink()))
-            ).dimensions(centerX, buttonY, buttonWidth, 20).build());
+            ).dimensions(buttonCenterX, buttonY, buttonWidth, 20).build());
         }
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Back"),
                 button -> this.close()
-        ).dimensions(centerX, this.height - 30, buttonWidth, 20).build());
+        ).dimensions(buttonCenterX, this.height - 30, buttonWidth, 20).build());
     }
 
     private String extractDomain(String url) {
@@ -93,17 +165,6 @@ public class NewsDetailScreen extends Screen {
         int centerX = this.width / 2;
         int startY = 40;
 
-        String title = article.getTitle();
-        int titleWidth = this.textRenderer.getWidth("§6§l" + title);
-
-        context.drawTextWithShadow(
-                this.textRenderer,
-                "§6§l" + title,
-                centerX - titleWidth / 2,
-                startY,
-                0xFFFFFF
-        );
-
         int imageWidth = 400;
         int imageHeight = 250;
         int imageX = centerX - imageWidth / 2;
@@ -123,57 +184,25 @@ public class NewsDetailScreen extends Screen {
         } else {
             context.fill(imageX, imageY, imageX + imageWidth, imageY + imageHeight, 0xFF333333);
             context.drawBorder(imageX, imageY, imageWidth, imageHeight, 0xFF666666);
-            String loading = "Loading image...";
-            int loadingWidth = this.textRenderer.getWidth(loading);
-            context.drawTextWithShadow(
-                    this.textRenderer,
-                    loading,
-                    centerX - loadingWidth / 2,
-                    imageY + imageHeight / 2,
-                    0xFFFFFF
+
+            TextWidget loadingWidget = new TextWidget(
+                    0,
+                    imageY + imageHeight / 2 - 5,
+                    this.width,
+                    10,
+                    Text.literal("Loading image..."),
+                    this.textRenderer
             );
-        }
-
-        int descY = imageY + imageHeight + 20;
-        String description = article.getDescription();
-
-        int maxWidth = 500;
-        int lineHeight = 12;
-        String[] words = description.split(" ");
-        StringBuilder currentLine = new StringBuilder();
-        int currentY = descY;
-
-        for (String word : words) {
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            int testWidth = this.textRenderer.getWidth(testLine);
-
-            if (testWidth > maxWidth && currentLine.length() > 0) {
-                int lineWidth = this.textRenderer.getWidth(currentLine.toString());
-                context.drawTextWithShadow(
-                        this.textRenderer,
-                        currentLine.toString(),
-                        centerX - lineWidth / 2,
-                        currentY,
-                        0xCCCCCC
-                );
-                currentY += lineHeight;
-                currentLine = new StringBuilder(word);
-            } else {
-                currentLine = new StringBuilder(testLine);
-            }
-        }
-
-        if (currentLine.length() > 0) {
-            int lineWidth = this.textRenderer.getWidth(currentLine.toString());
-            context.drawTextWithShadow(
-                    this.textRenderer,
-                    currentLine.toString(),
-                    centerX - lineWidth / 2,
-                    currentY,
-                    0xCCCCCC
-            );
+            loadingWidget.alignCenter();
+            loadingWidget.render(context, mouseX, mouseY, delta);
         }
     }
+
+    private static final java.util.concurrent.ExecutorService IMAGE_POOL =
+            java.util.concurrent.Executors.newFixedThreadPool(3);
+
+    private static final java.util.Set<String> LOADING_IN_PROGRESS =
+            java.util.Collections.synchronizedSet(new java.util.HashSet<>());
 
     private void loadImage() {
         String urlString = article.getImageUrl();
@@ -185,12 +214,14 @@ public class NewsDetailScreen extends Screen {
             return;
         }
 
-        new Thread(() -> {
+        if (LOADING_IN_PROGRESS.contains(urlString)) return;
+        LOADING_IN_PROGRESS.add(urlString);
+
+        IMAGE_POOL.submit(() -> {
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-                conn.setRequestProperty("Referer", "https://imgur.com/");
+                conn.setRequestProperty("User-Agent", "LoverMods");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
 
@@ -200,25 +231,28 @@ public class NewsDetailScreen extends Screen {
                     this.client.execute(() -> {
                         try {
                             Identifier textureId = Identifier.of("lovermods", "news_" + urlString.hashCode());
-
                             NativeImageBackedTexture texture = createTexture(image);
-
                             this.client.getTextureManager().registerTexture(textureId, texture);
 
                             NewsImageCache.put(urlString, textureId);
                             this.imageTexture = textureId;
                             this.imageLoaded = true;
                         } catch (Exception e) {
-                            System.out.println("[LoverMods] Failed to create texture: " + e.getMessage());
-                            e.printStackTrace();
+                            /*
+                            System.out.println("[LoverMods] Texture registration failed: " + e.getMessage());
+                             */
+                        } finally {
+                            LOADING_IN_PROGRESS.remove(urlString);
                         }
                     });
                 }
             } catch (Exception e) {
-                System.out.println("[LoverMods] Failed to load image from URL: " + urlString);
-                e.printStackTrace();
+                /*
+                System.out.println("[LoverMods] Image load failed for " + urlString + ": " + e.getMessage());
+                 */
+                LOADING_IN_PROGRESS.remove(urlString);
             }
-        }).start();
+        });
     }
 
     private static NativeImageBackedTexture createTexture(NativeImage image) {

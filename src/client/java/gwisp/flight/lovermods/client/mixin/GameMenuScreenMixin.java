@@ -35,7 +35,7 @@ public abstract class GameMenuScreenMixin extends Screen {
         }
         lovermods$newsWidget.setBottomLeft(false);
 
-        int buttonWidth = 120;
+        int buttonWidth = 140;
         int buttonHeight = 20;
 
         int padding = 8;
