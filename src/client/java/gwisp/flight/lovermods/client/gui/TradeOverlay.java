@@ -118,6 +118,12 @@ public class TradeOverlay {
             }
         }
 
+        long theirTotal = calculateTotalValue(theirItems) + theirMoney;
+        long yourTotal = calculateTotalValue(yourItems) + yourMoney;
+        long combinedTotal = theirTotal + yourTotal;
+
+        checkTradeValueAchievements(combinedTotal);
+
         int guiLeft = (screen.width - 176) / 2;
         int guiRight = guiLeft + 176;
         int guiTop = (screen.height - 166) / 2;
@@ -375,6 +381,21 @@ public class TradeOverlay {
             this.hasSkin = hasSkin;
             this.value = value;
             this.count = count;
+        }
+    }
+
+    private static void checkTradeValueAchievements(long totalValue) {
+        if (totalValue >= 10_000_000_000L) { // 10b
+            AchievementManager.unlock("trade_value_10b");
+        }
+        if (totalValue >= 25_000_000_000L) { // 25b
+            AchievementManager.unlock("trade_value_25b");
+        }
+        if (totalValue >= 50_000_000_000L) { // 50b
+            AchievementManager.unlock("trade_value_50b");
+        }
+        if (totalValue >= 100_000_000_000L) { // 100b
+            AchievementManager.unlock("trade_value_100b");
         }
     }
 }

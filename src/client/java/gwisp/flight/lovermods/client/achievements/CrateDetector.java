@@ -14,6 +14,7 @@ public class CrateDetector {
     private static String lastCrateType = null;
     private static final Set<String> detectedCratesThisSession = new HashSet<>();
     private static final Pattern REMOVE_PATTERN = Pattern.compile("Remove\\s+(\\d+)", Pattern.CASE_INSENSITIVE);
+    private static final int VALID_KEY_SLOT = 13;
 
     public static void onSlotClick(Slot slot) {
         if (slot == null || slot.getStack().isEmpty()) return;
@@ -24,6 +25,8 @@ public class CrateDetector {
         String screenTitle = client.currentScreen.getTitle().getString();
 
         if (screenTitle.contains("BULK OPENING")) {
+            if (slot.getIndex() != VALID_KEY_SLOT) return;
+
             ItemStack clickedStack = slot.getStack();
             String itemName = clickedStack.getName().getString();
 
@@ -42,6 +45,8 @@ public class CrateDetector {
         }
 
         if (!screenTitle.toLowerCase().contains("crate")) return;
+
+        if (slot.getIndex() != VALID_KEY_SLOT) return;
 
         ItemStack stack = slot.getStack();
         String itemName = stack.getName().getString();

@@ -73,7 +73,7 @@ public class AchievementsScreen extends Screen {
         int testButtonY = 10;
         int testButtonX = this.width - 180;
 
-        /*
+
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("§cReset All"),
                 button -> {
@@ -90,7 +90,6 @@ public class AchievementsScreen extends Screen {
                 }
         ).dimensions(testButtonX + 90, testButtonY, 80, 20).build());
 
-         */
 
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Back"),

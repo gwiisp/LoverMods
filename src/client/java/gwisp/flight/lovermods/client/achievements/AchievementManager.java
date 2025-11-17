@@ -117,16 +117,6 @@ public class AchievementManager {
         ));
 
         register(new Achievement(
-                "mcmmo_level_100000",
-                "Uhhh Grinder..??",
-                "Reach level 100,000 in any MCMMO skill. This isnt actually possible dont even bother",
-                "🔥",
-                Achievement.AchievementCategory.MCMMO,
-                100000,
-                Achievement.AchievementRarity.IMPOSSIBLE
-        ));
-
-        register(new Achievement(
                 "first_crate",
                 "Lucky Box",
                 "Open your first crate",
@@ -275,6 +265,46 @@ public class AchievementManager {
                 100,
                 Achievement.AchievementRarity.EPIC
         ).withProgress(100));
+
+        register(new Achievement(
+                "trade_value_10b",
+                "Big Trader",
+                "View a trade with 10b+ total value",
+                "💰",
+                Achievement.AchievementCategory.TRADING,
+                100,
+                Achievement.AchievementRarity.RARE
+        ));
+
+        register(new Achievement(
+                "trade_value_25b",
+                "Whale Watcher",
+                "View a trade with 25b+ total value",
+                "🐋",
+                Achievement.AchievementCategory.TRADING,
+                250,
+                Achievement.AchievementRarity.EPIC
+        ));
+
+        register(new Achievement(
+                "trade_value_50b",
+                "Economy Master",
+                "View a trade with 50b+ total value",
+                "💎",
+                Achievement.AchievementCategory.TRADING,
+                500,
+                Achievement.AchievementRarity.LEGENDARY
+        ));
+
+        register(new Achievement(
+                "trade_value_100b",
+                "Billionaire's Club",
+                "View a trade with 100b+ total value",
+                "👑",
+                Achievement.AchievementCategory.TRADING,
+                1000,
+                Achievement.AchievementRarity.MYTHIC
+        ));
 
         register(new Achievement(
                 "holy_collexl",
@@ -429,6 +459,11 @@ public class AchievementManager {
                 .toLowerCase()
                 .trim();
 
+        if (normalized.startsWith("message from qa tester lunargato:") && normalized.contains("nuub")) {
+            unlock("lunargato_nuub");
+            System.out.println("[LoverMods] LunarGato called you a nuub!");
+        }
+
         if (normalized.contains("entering collexl") || normalized.contains("collexl's claimed land")) {
             unlock("cisland");
             System.out.println("[LoverMods] Entered Collexl's claimed land — unlocked cisland");
@@ -560,6 +595,7 @@ public class AchievementManager {
             }
         }
     }
+
 
     private static void loadProgress() {
         if (!Files.exists(SAVE_FILE)) {
